@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helper\JWT_TOKEN;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
@@ -41,6 +42,34 @@ class UserController extends Controller {
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Registration failed'], 500 );
+        }
+    }
+    /**
+     * User Login Method
+     * @param Request $request
+     * @return mixed
+     *
+     */
+    public function userLogin( Request $request ) {
+        try {
+            $user = User::where( 'email', $request->email )->first();
+            if ( !$user ) {
+                return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
+            }
+
+            if ( Hash::check( $request->password, $user->password ) ) {
+                $token = JWT_TOKEN::create_token( $user->email );
+                return response()->json( ['status' => 'success', 'message' => 'Login Successful', 'token' => $token], 200 );
+            } else {
+                return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
+            }
+
+        } catch ( \Illuminate\Database\QueryException $ex ) {
+            // Handle database query exceptions
+            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
+        } catch ( \Throwable $th ) {
+            // Handle other exceptions
+            return response()->json( ['status' => 'Failed', 'message' => $th->getMessage()], 500 );
         }
     }
 }
