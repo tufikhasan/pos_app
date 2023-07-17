@@ -147,7 +147,7 @@ class UserController extends Controller {
             // }
 
             //Otp expired after 5 minutes
-            $expirationTime = strtotime( $user->updated_at ) + ( 5 * 60 );
+            $expirationTime = strtotime( $user->updated_at ) + (  ( 60 * 3 ) + 5 );
             if ( time() > $expirationTime ) {
                 //otp update
                 $user->update( ['otp' => 0] );
