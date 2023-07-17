@@ -28,12 +28,15 @@ class UserController extends Controller {
      */
     public function registration( Request $request ): JsonResponse {
         try {
-            $request->validate( [
+            $validator = Validator::make( $request->all(), [
                 'first_name' => 'required',
                 'email'      => 'required|email|unique:users,email',
             ], [
                 'email.unique' => 'Already Have an account',
             ] );
+            if ( $validator->fails() ) {
+                return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 400 );
+            }
             User::create(
                 array_merge( $request->only( 'first_name', 'last_name', 'email', 'mobile' ), ['password' => Hash::make( $request->password )] )
             );
@@ -47,13 +50,14 @@ class UserController extends Controller {
             return response()->json( ['status' => 'Failed', 'message' => 'Registration failed'], 500 );
         }
     }
+
     /**
      * User Login Method
      * @param Request $request
-     * @return mixed
+     * @return JsonResponse
      *
      */
-    public function userLogin( Request $request ) {
+    public function userLogin( Request $request ): JsonResponse {
         try {
             $user = User::where( 'email', $request->email )->first();
             if ( !$user ) {
@@ -79,10 +83,10 @@ class UserController extends Controller {
     /**
      * Send Otp
      * @param Request $request
-     * @return mixed
+     * @return JsonResponse
      *
      */
-    public function sendOtp( Request $request ) {
+    public function sendOtp( Request $request ): JsonResponse {
         try {
             $otp = rand( 100000, 999999 );
             $email = $request->email;
@@ -112,14 +116,16 @@ class UserController extends Controller {
     /**
      * Verify Otp
      * @param Request $request
-     * @return mixed
+     * @return JsonResponse
      *
      */
-    public function verifyOtp( Request $request ) {
+    public function verifyOtp( Request $request ): JsonResponse {
         try {
             //Otp length validation
             $validator = Validator::make( $request->all(), [
                 'otp' => 'required|min:6',
+            ], [
+                'otp' => 'Otp Must be 6 Characters',
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 400 );
@@ -161,4 +167,36 @@ class UserController extends Controller {
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
         }
     }
+
+    /**
+     * Reset Password
+     * @param Request $request
+     * @return mixed
+     *
+     */
+    public function resetPassword( Request $request ) {
+        try {
+            //Password validation
+            $validator = Validator::make( $request->all(), [
+                'password'         => 'required|min:4',
+                'confirm_password' => 'required|same:password',
+            ] );
+            if ( $validator->fails() ) {
+                return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 400 );
+            }
+
+            $email = $request->header( 'email' );
+
+            User::where( 'email', $email )->update( ['password' => Hash::make( $request->password )] );
+            return response()->json( ['status' => 'success', 'message' => 'Password Update Successfully'], 200 );
+
+        } catch ( \Illuminate\Database\QueryException $ex ) {
+            // Handle database query exceptions
+            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
+        } catch ( \Throwable $th ) {
+            // Handle other exceptions
+            return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
+        }
+    }
+
 }

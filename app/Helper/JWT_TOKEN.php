@@ -32,7 +32,7 @@ class JWT_TOKEN {
             $decode = JWT::decode( $token, new Key( $key, 'HS256' ) );
             return $decode->user_email;
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'Invalid', 'message' => 'Unauthorized'], 401 );
+            return 'unauthorized';
         }
 
     }

@@ -9,4 +9,5 @@ Route::controller( UserController::class )->group( function () {
     Route::post( '/user/login', 'userLogin' );
     Route::post( '/send/otp', 'sendOtp' );
     Route::post( '/verify/otp', 'verifyOtp' );
+    Route::post( '/reset/password', 'resetPassword' )->middleware( 'verify.token' );
 } );
