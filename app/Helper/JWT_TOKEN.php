@@ -36,4 +36,20 @@ class JWT_TOKEN {
         }
 
     }
+
+    /**
+     * Generate JWT Token for Reset password
+     * @param string $user_email
+     * @return string
+     */
+    public static function reset_token( $user_email ): string{
+        $key = env( 'JWT_KEY' );
+        $payload = [
+            'iss' => 'pos-token',
+            'iat' => time(),
+            'exp' => time() + ( 60 * 5 ), // expired after 5 minutes
+            'user_email' => $user_email,
+        ];
+        return JWT::encode( $payload, $key, 'HS256' );
+    }
 }
