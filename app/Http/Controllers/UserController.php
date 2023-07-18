@@ -29,25 +29,21 @@ class UserController extends Controller {
     public function registration( Request $request ): JsonResponse {
         try {
             $validator = Validator::make( $request->all(), [
-                'first_name' => 'required',
-                'email'      => 'required|email|unique:users,email',
+                'email' => 'required|email|unique:users,email',
             ], [
                 'email.unique' => 'Already Have an account',
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 400 );
+                return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 403 );
             }
             User::create(
                 array_merge( $request->only( 'first_name', 'last_name', 'email', 'mobile' ), ['password' => Hash::make( $request->password )] )
             );
             return response()->json( ['status' => 'success', 'message' => 'User Registration Successful'], 201 );
 
-        } catch ( \Illuminate\Database\QueryException $ex ) {
-            // Handle database query exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
         } catch ( \Throwable $th ) {
             // Handle other exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Registration failed'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Registration failed'] );
         }
     }
 
@@ -66,14 +62,11 @@ class UserController extends Controller {
 
             if ( Hash::check( $request->password, $user->password ) ) {
                 $token = JWT_TOKEN::create_token( $user->email );
-                return response()->json( ['status' => 'success', 'message' => 'Login Successful', 'token' => $token], 200 );
+                return response()->json( ['status' => 'success', 'message' => 'Login Successful'], 200 )->cookie( 'token', $token, 60 * 60 * 24 );
             } else {
                 return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
             }
 
-        } catch ( \Illuminate\Database\QueryException $ex ) {
-            // Handle database query exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
@@ -94,7 +87,7 @@ class UserController extends Controller {
             $user = User::where( 'email', $email )->first();
 
             if ( !$user ) {
-                return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
+                return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 401 );
             }
 
             //OTP send
@@ -104,9 +97,6 @@ class UserController extends Controller {
 
             return response()->json( ['status' => 'success', 'message' => "6 digit otp code send this {$email} email. Please check your mail"], 200 );
 
-        } catch ( \Illuminate\Database\QueryException $ex ) {
-            // Handle database query exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
@@ -157,11 +147,8 @@ class UserController extends Controller {
             $user->update( ['otp' => 0] );
             //create password reset token
             $reset_token = JWT_TOKEN::reset_token( $email );
-            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully", 'reset_token' => $reset_token], 200 );
+            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully"], 200 )->cookie( 'token', $reset_token, (  ( 60 * 3 ) + 5 ) );
 
-        } catch ( \Illuminate\Database\QueryException $ex ) {
-            // Handle database query exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
@@ -188,11 +175,8 @@ class UserController extends Controller {
             $email = $request->header( 'email' );
 
             User::where( 'email', $email )->update( ['password' => Hash::make( $request->password )] );
-            return response()->json( ['status' => 'success', 'message' => 'Password Update Successfully'], 200 );
+            return response()->json( ['status' => 'success', 'message' => 'Password Update Successfully'], 200 )->cookie( 'token', '' );
 
-        } catch ( \Illuminate\Database\QueryException $ex ) {
-            // Handle database query exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Database connection error'], 500 );
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );

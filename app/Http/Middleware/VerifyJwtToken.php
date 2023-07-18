@@ -14,7 +14,7 @@ class VerifyJwtToken {
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle( Request $request, Closure $next ): Response{
-        $token = $request->header( 'token' );
+        $token = $request->cookie( 'token' );
         $verify = JWT_TOKEN::verify_token( $token );
 
         if ( 'unauthorized' == $verify ) {

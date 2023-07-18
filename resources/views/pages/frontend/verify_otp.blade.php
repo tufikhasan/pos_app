@@ -17,18 +17,20 @@
                     </div>
                     <div class="form-login">
                         <div class="countdown" style="height: 30px"></div>
-                        <div style="display:flex; gap:.5rem">
-                            <input type="text" id='ist' maxlength="1" onkeyup="clickEvent(this,'sec')">
-                            <input type="text" id="sec" maxlength="1" onkeyup="clickEvent(this,'third')">
-                            <input type="text" id="third" maxlength="1" onkeyup="clickEvent(this,'fourth')">
-                            <input type="text" id="fourth" maxlength="1" onkeyup="clickEvent(this,'fifth')">
-                            <input type="text" id="fifth" maxlength="1" onkeyup="clickEvent(this,'sixth')">
-                            <input type="text" id="sixth" maxlength="1">
-                        </div>
+                        <form id="verify_otp_form">
+                            <div style="display: flex; gap: 0.5rem">
+                                <input type="text" id="ist" maxlength="1" onkeyup="clickEvent(this,'sec')" />
+                                <input type="text" id="sec" maxlength="1" onkeyup="clickEvent(this,'third')" />
+                                <input type="text" id="third" maxlength="1" onkeyup="clickEvent(this,'fourth')" />
+                                <input type="text" id="fourth" maxlength="1" onkeyup="clickEvent(this,'fifth')" />
+                                <input type="text" id="fifth" maxlength="1" onkeyup="clickEvent(this,'sixth')" />
+                                <input type="text" id="sixth" maxlength="1" />
+                            </div>
                     </div>
                     <div class="form-login">
-                        <a class="btn btn-login" href="signin.html">Submit</a>
+                        <button type="submit" class="btn btn-login">Verify OTP</button>
                     </div>
+                    </form>
                 </div>
             </div>
             <div class="login-img">
@@ -37,31 +39,82 @@
         </div>
     </div>
 @endsection
-<script>
-    function clickEvent(first, last) {
-        if (first.value.length) {
-            document.getElementById(last).focus();
+@section('script')
+    <script>
+        const form = document.getElementById("verify_otp_form");
+        form.addEventListener("submit", async function(e) {
+            e.preventDefault();
+            try {
+                const email = sessionStorage.getItem("email");
+                const ist = document.getElementById("ist").value;
+                const sec = document.getElementById("sec").value;
+                const third = document.getElementById("third").value;
+                const fourth = document.getElementById("fourth").value;
+                const fifth = document.getElementById("fifth").value;
+                const sixth = document.getElementById("sixth").value;
+                const otp = ist + sec + third + fourth + fifth + sixth;
+
+                if (0 == otp.length) {
+                    toastr.info("OTP is Required", "POS Says:");
+                } else if (6 != otp.length) {
+                    toastr.info("OTP Must be 6 characters", "POS Says:");
+                } else {
+                    showLoader()
+                    const data = {
+                        email: email,
+                        otp: otp,
+                    };
+                    const URL = "{{ url('/verify/otp') }}";
+                    const response = await axios.post(URL, data);
+                    if (
+                        200 == response.status &&
+                        "success" == response.data.status
+                    ) {
+                        toastr.success(response.data.message, "POS Says:");
+                        sessionStorage.clear();
+                        window.location.href = "{{ route('reset.password') }}";
+                    }
+                }
+                hideLoader()
+            } catch (error) {
+                if (400 == error.response.status) {
+                    toastr.error(error.response.data.message, "POS Says:");
+                }
+                if (500 == error.response.status) {
+                    toastr.error(error.response.data.message, "POS Says:");
+                }
+                hideLoader()
+            }
+        });
+    </script>
+    <script>
+        function clickEvent(first, last) {
+            if (first.value.length) {
+                document.getElementById(last).focus();
+            }
         }
-    }
 
-    function timer(minutes, seconds) {
-        let timer = setInterval(() => {
+        function timer(minutes, seconds) {
+            let timer = setInterval(() => {
+                if (minutes < 0) {
+                    $(".countdown").text("");
+                    clearInterval(timer);
+                } else {
+                    let tempMinutes =
+                        minutes.toString().length > 1 ? minutes : "0" + minutes;
+                    let tempSeconds =
+                        seconds.toString().length > 1 ? seconds : "0" + seconds;
+                    $(".countdown").text(tempMinutes + ":" + tempSeconds);
+                }
+                if (seconds <= 0) {
+                    minutes--;
+                    seconds = 59;
+                }
+                seconds--;
+            }, 1000);
+        }
 
-            if (minutes < 0) {
-                $('.countdown').text('');
-                clearInterval(timer);
-            } else {
-                let tempMinutes = minutes.toString().length > 1 ? minutes : '0' + minutes;
-                let tempSeconds = seconds.toString().length > 1 ? seconds : '0' + seconds;
-                $('.countdown').text(tempMinutes + ':' + tempSeconds);
-            }
-            if (seconds <= 0) {
-                minutes--;
-                seconds = 59;
-            }
-            seconds--;
-        }, 1000);
-    }
+        timer(2, 59);
+    </script>
 
-    timer(2, 59);
-</script>
+@endsection

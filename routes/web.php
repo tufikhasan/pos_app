@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\FrontEndController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -14,24 +15,12 @@ Route::controller( UserController::class )->group( function () {
 
 Route::get( '/dashboard', function () {
     return view( 'layouts.dashboard' );
+} )->name('dashboard');
+
+Route::controller( FrontEndController::class )->group( function () {
+    Route::get( '/', 'loginPage' )->name( 'login' );
+    Route::get( '/register', 'registerPage' )->name( 'register' );
+    Route::get( '/send/otp', 'forgetPage' )->name( 'forgot.password' );
+    Route::get( '/verify/otp', 'verifyOtpPage' )->name( 'verify.otp' );
+    Route::get( '/reset/password', 'resetPasswordPage' )->name( 'reset.password' );
 } );
-
-Route::get( '/', function () {
-    return view( 'pages.frontend.login' );
-} )->name( 'login' );
-
-Route::get( '/register', function () {
-    return view( 'pages.frontend.register' );
-} )->name( 'register' );
-
-Route::get( '/forgot/password', function () {
-    return view( 'pages.frontend.forgot_password' );
-} )->name( 'forgot.password' );
-
-Route::get( '/verify/otp', function () {
-    return view( 'pages.frontend.verify_otp' );
-} )->name( 'verify.otp' );
-
-Route::get( '/reset/password', function () {
-    return view( 'pages.frontend.reset_password' );
-} )->name( 'reset.password' );
