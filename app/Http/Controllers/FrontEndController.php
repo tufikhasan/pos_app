@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\Request;
 
 class FrontEndController extends Controller {
     /**
@@ -35,6 +37,26 @@ class FrontEndController extends Controller {
      */
     function verifyOtpPage(): View {
         return view( 'pages.frontend.verify_otp' );
+    }
+    /**
+     * Show countdown time in verify otp page
+     * @return mixed
+     */
+    function showCountdown( Request $request ) {
+        $data = User::where( 'email', $request->email )->select( 'updated_at' )->first();
+        $updated_time = strtotime( $data->updated_at ) + ( 60 * 3 );
+        $current_time = time();
+
+        $interval = abs( $current_time - $updated_time );
+        $minutes = floor( $interval / 60 ); // Get the number of minutes
+        $seconds = $interval % 60; // Get the remaining seconds
+
+        return [
+            'update_time'  => $updated_time,
+            'minutes'      => $minutes,
+            'seconds'      => $seconds,
+            'current_time' => $current_time,
+        ];
     }
 
     /**

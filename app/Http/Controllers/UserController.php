@@ -137,7 +137,7 @@ class UserController extends Controller {
             // }
 
             //Otp expired after 5 minutes
-            $expirationTime = strtotime( $user->updated_at ) + (  ( 60 * 3 ) + 5 );
+            $expirationTime = strtotime( $user->updated_at ) + ( 60 * 3 );
             if ( time() > $expirationTime ) {
                 //otp update
                 $user->update( ['otp' => 0] );
@@ -147,7 +147,7 @@ class UserController extends Controller {
             $user->update( ['otp' => 0] );
             //create password reset token
             $reset_token = JWT_TOKEN::reset_token( $email );
-            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully"], 200 )->cookie( 'token', $reset_token, (  ( 60 * 3 ) + 5 ) );
+            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully"], 200 )->cookie( 'token', $reset_token, ( 60 * 5 ) );
 
         } catch ( \Throwable $th ) {
             // Handle other exceptions

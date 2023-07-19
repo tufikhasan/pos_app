@@ -15,12 +15,13 @@ Route::controller( UserController::class )->group( function () {
 
 Route::get( '/dashboard', function () {
     return view( 'layouts.dashboard' );
-} )->name('dashboard');
+} )->name( 'dashboard' );
 
 Route::controller( FrontEndController::class )->group( function () {
     Route::get( '/', 'loginPage' )->name( 'login' );
     Route::get( '/register', 'registerPage' )->name( 'register' );
     Route::get( '/send/otp', 'forgetPage' )->name( 'forgot.password' );
     Route::get( '/verify/otp', 'verifyOtpPage' )->name( 'verify.otp' );
+    Route::get( '/countdown/{email}', 'showCountdown' )->name( 'countdown' );
     Route::get( '/reset/password', 'resetPasswordPage' )->name( 'reset.password' );
 } );

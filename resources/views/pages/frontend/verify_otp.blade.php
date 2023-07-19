@@ -41,6 +41,50 @@
 @endsection
 @section('script')
     <script>
+        function clickEvent(first, last) {
+            if (first.value.length) {
+                document.getElementById(last).focus();
+            }
+        }
+
+        function timer(minutes, seconds) {
+            let timer = setInterval(() => {
+                if (minutes < 0) {
+                    $(".countdown").text("");
+                    clearInterval(timer);
+                } else {
+                    let tempMinutes =
+                        minutes.toString().length > 1 ? minutes : "0" + minutes;
+                    let tempSeconds =
+                        seconds.toString().length > 1 ? seconds : "0" + seconds;
+                    $(".countdown").text(tempMinutes + ":" + tempSeconds);
+                }
+                if (seconds <= 0) {
+                    minutes--;
+                    seconds = 59;
+                }
+                seconds--;
+            }, 1000);
+        }
+        //count down timer show
+        (async () => {
+            try {
+                showLoader()
+                const em = sessionStorage.getItem('email');
+                const timeUrl = "{{ route('countdown', ':email') }}".replace(':email', encodeURIComponent(em));
+                // const timeUrl = `/countdown/${em}`;
+                const resTime = await axios.get(timeUrl);
+                hideLoader()
+                if (resTime.data.current_time <= resTime.data.update_time) {
+                    timer(resTime.data.minutes, resTime.data.seconds);
+                }
+            } catch (error) {
+                console.log('something went wrong');
+                hideLoader()
+            }
+        })()
+    </script>
+    <script>
         const form = document.getElementById("verify_otp_form");
         form.addEventListener("submit", async function(e) {
             e.preventDefault();
@@ -87,34 +131,4 @@
             }
         });
     </script>
-    <script>
-        function clickEvent(first, last) {
-            if (first.value.length) {
-                document.getElementById(last).focus();
-            }
-        }
-
-        function timer(minutes, seconds) {
-            let timer = setInterval(() => {
-                if (minutes < 0) {
-                    $(".countdown").text("");
-                    clearInterval(timer);
-                } else {
-                    let tempMinutes =
-                        minutes.toString().length > 1 ? minutes : "0" + minutes;
-                    let tempSeconds =
-                        seconds.toString().length > 1 ? seconds : "0" + seconds;
-                    $(".countdown").text(tempMinutes + ":" + tempSeconds);
-                }
-                if (seconds <= 0) {
-                    minutes--;
-                    seconds = 59;
-                }
-                seconds--;
-            }, 1000);
-        }
-
-        timer(2, 59);
-    </script>
-
 @endsection

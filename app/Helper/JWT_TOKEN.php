@@ -47,7 +47,7 @@ class JWT_TOKEN {
         $payload = [
             'iss' => 'pos-token',
             'iat' => time(),
-            'exp' => time() + (  ( 60 * 3 ) + 5 ), // expired after 5 minutes
+            'exp' => time() + ( 60 * 5 ), // expired after 5 minutes
             'user_email' => $user_email,
         ];
         return JWT::encode( $payload, $key, 'HS256' );
