@@ -9,15 +9,17 @@ class JWT_TOKEN {
     /**
      * Generate JWT Token
      * @param string $user_email
+     * @param string $user_id
      * @return string
      */
-    public static function create_token( $user_email ): string{
+    public static function create_token( $user_email, $user_id ): string{
         $key = env( 'JWT_KEY' );
         $payload = [
-            'iss' => 'pos-token',
-            'iat' => time(),
-            'exp' => time() + ( 60 * 60 * 2 ), // expired after 2 hours
+            'iss'     => 'pos-token',
+            'iat'     => time(),
+            'exp'     => time() + ( 60 * 60 * 2 ), // expired after 2 hours
             'user_email' => $user_email,
+            'user_id' => $user_id,
         ];
         return JWT::encode( $payload, $key, 'HS256' );
     }
@@ -28,9 +30,12 @@ class JWT_TOKEN {
      */
     public static function verify_token( $token ) {
         try {
+            if ( $token == null ) {
+                return 'unauthorized';
+            }
             $key = env( 'JWT_KEY' );
             $decode = JWT::decode( $token, new Key( $key, 'HS256' ) );
-            return $decode->user_email;
+            return $decode;
         } catch ( \Throwable $th ) {
             return 'unauthorized';
         }
@@ -42,13 +47,14 @@ class JWT_TOKEN {
      * @param string $user_email
      * @return string
      */
-    public static function reset_token( $user_email ): string{
+    public static function reset_token( $user_email, $user_id = null ): string{
         $key = env( 'JWT_KEY' );
         $payload = [
-            'iss' => 'pos-token',
-            'iat' => time(),
-            'exp' => time() + ( 60 * 5 ), // expired after 5 minutes
+            'iss'     => 'pos-token',
+            'iat'     => time(),
+            'exp'     => time() + ( 60 * 5 ), // expired after 5 minutes
             'user_email' => $user_email,
+            'user_id' => $user_id,
         ];
         return JWT::encode( $payload, $key, 'HS256' );
     }

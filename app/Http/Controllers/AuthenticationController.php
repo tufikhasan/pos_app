@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helper\JWT_TOKEN;
 use App\Mail\OTPMail;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,13 +13,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
-class UserController extends Controller {
+class AuthenticationController extends Controller {
     /**
      * Get All Users
      * @return Collection
      */
     public function allUsers(): Collection {
         return User::latest()->get();
+    }
+
+    /**
+     * Register Page view
+     * @return View
+     */
+    function registerPage(): View {
+        return view( 'pages.frontend.register' );
     }
 
     /**
@@ -45,6 +54,14 @@ class UserController extends Controller {
             // Handle other exceptions
             return response()->json( ['status' => 'failed', 'message' => 'Registration failed'] );
         }
+    }
+
+    /**
+     * Login Page view
+     * @return View
+     */
+    function loginPage(): View {
+        return view( 'pages.frontend.login' );
     }
 
     /**
@@ -83,6 +100,14 @@ class UserController extends Controller {
     }
 
     /**
+     * Forgot Password Page view
+     * @return View
+     */
+    function forgetPage(): View {
+        return view( 'pages.frontend.forget_password' );
+    }
+
+    /**
      * Send Otp
      * @param Request $request
      * @return JsonResponse
@@ -110,6 +135,34 @@ class UserController extends Controller {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
         }
+    }
+
+    /**
+     * Verify OTP Page view
+     * @return View
+     */
+    function verifyOtpPage(): View {
+        return view( 'pages.frontend.verify_otp' );
+    }
+    /**
+     * Show countdown time in verify otp page
+     * @return mixed
+     */
+    function showCountdown( Request $request ) {
+        $data = User::where( 'email', $request->email )->select( 'updated_at' )->first();
+        $updated_time = strtotime( $data->updated_at ) + ( 60 * 3 );
+        $current_time = time();
+
+        $interval = abs( $current_time - $updated_time );
+        $minutes = floor( $interval / 60 ); // Get the number of minutes
+        $seconds = $interval % 60; // Get the remaining seconds
+
+        return [
+            'update_time'  => $updated_time,
+            'minutes'      => $minutes,
+            'seconds'      => $seconds,
+            'current_time' => $current_time,
+        ];
     }
 
     /**
@@ -147,6 +200,14 @@ class UserController extends Controller {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
         }
+    }
+
+    /**
+     * Reset Password Page view
+     * @return View
+     */
+    function resetPasswordPage(): View {
+        return view( 'pages.frontend.reset_password' );
     }
 
     /**

@@ -225,7 +225,7 @@
                             <a class="dropdown-item" href="generalsettings.html"><i class="mr-2"
                                     data-feather="settings"></i>Settings</a>
                             <hr class="!m-0">
-                            <a class="dropdown-item logout !pb-0" href="{{ route('login') }}"><img
+                            <a class="dropdown-item logout !pb-0" href="{{ route('logout') }}"><img
                                     src="assets/img/icons/log-out.svg" class="mr-2" alt="img">Logout</a>
                         </div>
                     </div>

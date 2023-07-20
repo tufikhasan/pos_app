@@ -7,7 +7,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class VerifyJwtToken {
+class RedirectIfTokenVerify {
     /**
      * Handle an incoming request.
      *
@@ -17,11 +17,9 @@ class VerifyJwtToken {
         $token = $request->cookie( 'token' );
         $verify = JWT_TOKEN::verify_token( $token );
 
-        if ( 'unauthorized' == $verify ) {
-            return redirect()->route( 'login' );
+        if ( $token && $verify ) {
+            return redirect()->route( 'dashboard' ); // Replace 'dashboard' with your desired authenticated route
         } else {
-            $request->headers->set( 'email', $verify->user_email );
-            $request->headers->set( 'id', $verify->user_id );
             return $next( $request );
         }
     }
