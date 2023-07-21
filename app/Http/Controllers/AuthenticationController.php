@@ -27,7 +27,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function registerPage(): View {
-        return view( 'pages.frontend.register' );
+        return view( 'pages.auth.register' );
     }
 
     /**
@@ -61,7 +61,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function loginPage(): View {
-        return view( 'pages.frontend.login' );
+        return view( 'pages.auth.login' );
     }
 
     /**
@@ -104,7 +104,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function forgetPage(): View {
-        return view( 'pages.frontend.forget_password' );
+        return view( 'pages.auth.forget_password' );
     }
 
     /**
@@ -142,7 +142,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function verifyOtpPage(): View {
-        return view( 'pages.frontend.verify_otp' );
+        return view( 'pages.auth.verify_otp' );
     }
     /**
      * Show countdown time in verify otp page
@@ -207,7 +207,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function resetPasswordPage(): View {
-        return view( 'pages.frontend.reset_password' );
+        return view( 'pages.auth.reset_password' );
     }
 
     /**
@@ -238,4 +238,81 @@ class AuthenticationController extends Controller {
         }
     }
 
+    /**
+     * Profile Page view
+     * @return View
+     */
+    function profilePage(): View {
+        return view( 'pages.profile' );
+    }
+
+    /**
+     * Profile Details
+     * @param Request $request
+     * @return object
+     */
+    function profileDetails( Request $request ) {
+        $user = User::where( ['id' => $request->header( 'id' ), 'email' => $request->header( 'email' )] )->first();
+        return $user;
+    }
+    /**
+     * Profile Details update
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function profileUpdate( Request $request ): JsonResponse{
+        User::where( ['id' => $request->header( 'id' ), 'email' => $request->header( 'email' )] )->update( [
+            'first_name' => $request->first_name,
+            'last_name'  => $request->last_name,
+            'mobile'     => $request->mobile,
+        ] );
+        return response()->json( ['status' => 'success', 'message' => 'Profile Update Successfully'], 200 );
+    }
+    /**
+     * Profile Image Update
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function profileImgUpdate( Request $request ): JsonResponse{
+        $user = User::findOrFail( $request->header( 'id' ) );
+
+        $image = $request->file( 'image' );
+        if ( $request->hasFile( 'image' ) ) {
+            $imageUrl = 'upload/avtar/' . hexdec( uniqid() ) . '.' . $image->getClientOriginalExtension();
+
+            if ( $user->image && file_exists( public_path( $user->image ) ) ) {
+                unlink( public_path( $user->image ) );
+            }
+
+            $image->move( public_path( 'upload/avtar' ), $imageUrl );
+            $user->image = $imageUrl;
+            $user->save();
+
+            return response()->json( ['status' => 'success', 'message' => 'Profile Image Updated Successfully'], 200 );
+        }
+        return response()->json( ['status' => 'not-change', 'message' => 'Nothing changes'], 200 );
+    }
+
+    /**
+     * Change Password view
+     * @return View
+     */
+    function changePassword(): View {
+        return view( 'pages.change_password' );
+    }
+    /**
+     * Profile Image Update
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function updatePassword( Request $request ): JsonResponse{
+        $user = User::findOrFail( $request->header( 'id' ) );
+
+        if ( Hash::check( $request->old_password, $user->password ) ) {
+            $user->update( ['password' => Hash::make( $request->new_password )] );
+            return response()->json( ['status' => 'success', 'message' => 'Password Updated Successfully'], 200 );
+        } else {
+            return response()->json( ['status' => 'failed', 'message' => 'OLD Password Not Match'], 200 );
+        }
+    }
 }

@@ -17,7 +17,7 @@ class RedirectIfTokenVerify {
         $token = $request->cookie( 'token' );
         $verify = JWT_TOKEN::verify_token( $token );
 
-        if ( $token && $verify ) {
+        if ( $token && $verify != 'unauthorized' ) {
             return redirect()->route( 'dashboard' ); // Replace 'dashboard' with your desired authenticated route
         } else {
             return $next( $request );
