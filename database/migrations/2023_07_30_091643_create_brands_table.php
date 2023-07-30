@@ -9,16 +9,13 @@ return new class extends Migration {
      * Run the migrations.
      */
     public function up(): void{
-        Schema::create( 'users', function ( Blueprint $table ) {
+        Schema::create( 'brands', function ( Blueprint $table ) {
             $table->id();
-            $table->string( 'first_name' );
-            $table->string( 'last_name' )->nullable();
-            $table->string( 'email' )->unique();
+            $table->foreignId( 'user_id' )->constrained();
+            $table->string( 'name' );
             $table->string( 'image' )->nullable();
-            $table->string( 'mobile' )->nullable();
-            $table->string( 'password' );
-            $table->string( 'otp' )->nullable();
-            $table->timestamps();
+            $table->timestamp( 'created_at' )->useCurrent();
+            $table->timestamp( 'updated_at' )->useCurrent()->useCurrentOnUpdate();
         } );
     }
 
@@ -26,6 +23,6 @@ return new class extends Migration {
      * Reverse the migrations.
      */
     public function down(): void{
-        Schema::dropIfExists( 'users' );
+        Schema::dropIfExists( 'brands' );
     }
 };

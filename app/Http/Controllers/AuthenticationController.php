@@ -243,7 +243,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function profilePage(): View {
-        return view( 'pages.profile' );
+        return view( 'pages.auth.profile' );
     }
 
     /**
@@ -298,7 +298,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function changePassword(): View {
-        return view( 'pages.change_password' );
+        return view( 'pages.auth.change_password' );
     }
     /**
      * Profile Image Update

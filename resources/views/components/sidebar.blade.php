@@ -1,27 +1,36 @@
+@php
+    $route = Route::current()->getName();
+@endphp
 <div class="sidebar" id="sidebar">
     <div class="sidebar-inner slimscroll">
         <div id="sidebar-menu" class="sidebar-menu">
             <ul>
-                <li class="active">
+                <li class="{{ 'dashboard' == $route ? 'active' : '' }}">
                     <a href="{{ route('dashboard') }}"><img src="{{ asset('assets/img/icons/dashboard.svg') }}"
                             alt="img"><span>
                             Dashboard</span> </a>
                 </li>
                 <li class="submenu">
-                    <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/product.svg') }}"
-                            alt="img"><span>
+                    <a href="javascript:void(0);"
+                        class="{{ in_array($route, ['product.page', 'category.page', 'brand.page']) ? 'active' : '' }}"><img
+                            src="{{ asset('assets/img/icons/product.svg') }}" alt="img"><span>
                             Product</span> <span class="menu-arrow"></span></a>
                     <ul>
-                        <li><a href="productlist.html">Product List</a></li>
-                        <li><a href="addproduct.html">Add Product</a></li>
-                        <li><a href="categorylist.html">Category List</a></li>
-                        <li><a href="addcategory.html">Add Category</a></li>
-                        <li><a href="subcategorylist.html">Sub Category List</a></li>
-                        <li><a href="subaddcategory.html">Add Sub Category</a></li>
-                        <li><a href="brandlist.html">Brand List</a></li>
-                        <li><a href="addbrand.html">Add Brand</a></li>
-                        <li><a href="importproduct.html">Import Products</a></li>
-                        <li><a href="barcode.html">Print Barcode</a></li>
+                        <li><a class="{{ 'brand.page' == $route ? 'active' : '' }}"
+                                href="{{ route('brand.page') }}">Brand List</a></li>
+                        <li><a class="{{ 'category.page' == $route ? 'active' : '' }}"
+                                href="{{ route('category.page') }}">Category List</a></li>
+                        <li><a class="{{ 'product.page' == $route ? 'active' : '' }}"
+                                href="{{ route('product.page') }}">Product List</a></li>
+                    </ul>
+                </li>
+                <li class="submenu">
+                    <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}"
+                            class="{{ in_array($route, ['customer.page']) ? 'active' : '' }}" alt="img"><span>
+                            Customers</span> <span class="menu-arrow"></span></a>
+                    <ul>
+                        <li><a class="{{ 'customer.page' == $route ? 'active' : '' }}"
+                                href="{{ route('customer.page') }}">Customer List</a></li>
                     </ul>
                 </li>
                 <li class="submenu">
@@ -89,16 +98,9 @@
                 <li class="submenu">
                     <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}"
                             alt="img"><span>
-                            People</span> <span class="menu-arrow"></span></a>
+                            Customers</span> <span class="menu-arrow"></span></a>
                     <ul>
-                        <li><a href="customerlist.html">Customer List</a></li>
-                        <li><a href="addcustomer.html">Add Customer </a></li>
-                        <li><a href="supplierlist.html">Supplier List</a></li>
-                        <li><a href="addsupplier.html">Add Supplier </a></li>
-                        <li><a href="userlist.html">User List</a></li>
-                        <li><a href="adduser.html">Add User</a></li>
-                        <li><a href="storelist.html">Store List</a></li>
-                        <li><a href="addstore.html">Add Store</a></li>
+                        <li><a href="{{ route('customer.page') }}">Customer List</a></li>
                     </ul>
                 </li>
                 <li class="submenu">

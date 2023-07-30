@@ -6,14 +6,12 @@
             <div class="login-content">
                 <div class="login-userset">
                     <div class="login-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="img" />
+                        <a href="{{ route('login') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="img" /></a>
                     </div>
                     <div class="login-userheading">
                         <h3>Forgot password?</h3>
-                        <h4>
-                            Don’t warry! it happens. Please enter the address <br />
-                            associated with your account.
-                        </h4>
+                        <h4>Please enter your account email address to receive an OTP (One-Time Password) in your email for
+                            changing your password.</h4>
                     </div>
                     <form id="forget_form">
                         <div class="form-login">

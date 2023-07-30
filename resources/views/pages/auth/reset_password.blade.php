@@ -6,14 +6,11 @@
             <div class="login-content">
                 <div class="login-userset">
                     <div class="login-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="img" />
+                        <a href="{{ route('login') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="img" /></a>
                     </div>
                     <div class="login-userheading">
                         <h3>Reset password?</h3>
-                        <h4>
-                            Don’t warry! it happens. Please enter the address <br />
-                            associated with your account.
-                        </h4>
+                        <h4>Create a new password</h4>
                     </div>
                     <form id="reset_password_form">
                         <div class="form-login">

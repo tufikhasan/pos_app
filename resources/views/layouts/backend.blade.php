@@ -28,7 +28,8 @@
     </div>
 
     <div class="main-wrapper">
-        @include('components.header') @include('components.sidebar')
+        @include('components.header')
+        @include('components.sidebar')
 
         <div class="page-wrapper">@yield('content')</div>
     </div>

@@ -6,7 +6,7 @@
             <div class="login-content">
                 <div class="login-userset">
                     <div class="login-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="img" />
+                        <a href="{{ route('login') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="img" /></a>
                     </div>
                     <div class="login-userheading">
                         <h3>Create an Account</h3>

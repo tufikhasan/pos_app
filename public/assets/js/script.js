@@ -610,3 +610,46 @@ function showLoader() {
 function hideLoader() {
     document.getElementById("loader").style.display = "none";
 }
+//modal show
+function showModal(id) {
+    document.getElementById(id).classList.remove("hidden");
+}
+//modal hide
+function hiddenModal(id, formId = null, outputImageId = null) {
+    document.getElementById(id).classList.add("hidden");
+    if (formId) {
+        document.getElementById(formId).reset();
+    }
+    if (outputImageId) {
+        document.getElementById(outputImageId).src = "../assets/no_image.jpg";
+    }
+}
+
+//image preview
+function imagePreview(inputId, outputId) {
+    $(document).ready(function () {
+        $(inputId).change(function (e) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $(outputId).attr("src", e.target.result);
+            };
+            reader.readAsDataURL(e.target.files["0"]);
+        });
+    });
+}
+//option value retrives list function
+async function populateDropdownList(url, elementId) {
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+        const dropdownElement = document.getElementById(elementId);
+
+        data.forEach((item) => {
+            dropdownElement.innerHTML += `<option value="${item["id"]}">${item[
+                "name"
+            ].toUpperCase()}</option>`;
+        });
+    } catch (error) {
+        console.log("Something went wrong", error);
+    }
+}

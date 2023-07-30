@@ -6,17 +6,16 @@
             <div class="login-content">
                 <div class="login-userset">
                     <div class="login-logo">
-                        <img src="{{ asset('assets/img/logo.png') }}" alt="img" />
+                        <a href="{{ route('login') }}"><img src="{{ asset('assets/img/logo.png') }}" alt="img" /></a>
                     </div>
                     <div class="login-userheading">
                         <h3>Verify OTP</h3>
-                        <h4>
-                            Don’t warry! it happens. Please enter the address <br />
-                            associated with your account.
-                        </h4>
+                        <h4>Don’t Share your OTP anyone</h4>
                     </div>
                     <div class="form-login">
-                        <div class="countdown" style="height: 30px"></div>
+                        <div style="font-weight:bold;text-align:center">
+                            <p class="countdown" style="height:50px;color: #ff9f43;font-size:2rem"></p>
+                        </div>
                         <form id="verify_otp_form">
                             <div style="display: flex; gap: 0.5rem">
                                 <input type="text" id="ist" maxlength="1" onkeyup="clickEvent(this,'sec')" />
