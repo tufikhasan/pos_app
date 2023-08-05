@@ -5,6 +5,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\PromotionalMailController;
 use Illuminate\Support\Facades\Route;
 
 Route::get( '/dashboard', function () {
@@ -91,5 +92,11 @@ Route::middleware( 'verify.token' )->group( function () {
 
         //Page Routes
         Route::get( '/product/list', 'productPage' )->name( 'product.page' );
+    } );
+
+    Route::controller( PromotionalMailController::class )->group( function () {
+        //Api Routes
+        Route::post( '/promotional/mail', 'sendPromotionMail' )->name( 'promotion.mail' );
+        Route::get( '/promotional/mail', 'promotionPage' )->name( 'promotion.page' );
     } );
 } );

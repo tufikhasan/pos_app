@@ -3,9 +3,11 @@
     brandList();
     async function brandList() {
         try {
-            document.getElementById("brand_list").innerHTML = "";
             const URL = "{{ route('brands') }}";
             const result = await axios.get(URL);
+
+            $('#brand_list').empty();
+
             result.data.forEach((brand, key) => {
                 document.getElementById("brand_list").innerHTML += `<tr>
                         <td>${(key + 1) < 10 ? "0" + (key + 1) : key + 1}</td>
@@ -55,21 +57,22 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('add_brand_modal', 'add_brand_form', 'showImage');
                 const addURL = "{{ route('add.brand') }}";
                 const response = await axios.post(addURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('add_brand_modal', 'add_brand_form', 'showImage')
-                brandList();
+                hideLoader();
+                await brandList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
             }
         } catch (error) {
-            // console.log('Internal server error');
-            console.log(error)
+            console.log('Internal server error');
         }
     });
 
@@ -79,7 +82,7 @@
     // show brand value in edit form
     $(document).on('click', '.update_brand_info', function(e) {
         showModal('edit_brand_modal')
-        let id, name, email, address, phone;
+        let id, name, image;
         id = $(this).data('id');
         name = $(this).data('name');
         image = $(this).data('image');
@@ -110,14 +113,16 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('edit_brand_modal', 'edit_brand_form', 'showImage');
                 const updateURL = "{{ route('update.brand', ':id') }}".replace(':id', id);
                 const response = await axios.post(updateURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('edit_brand_modal', 'edit_brand_form')
-                brandList();
+                hideLoader();
+                await brandList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -134,16 +139,18 @@
         $('#del_id').val(id);
     })
 
-    //update brand listener
+    //delete brand listener
     const delete_brand_form = document.getElementById("delete_brand_form");
     delete_brand_form.addEventListener("submit", async (e) => {
         e.preventDefault();
         try {
+            showLoader();
+            hiddenModal('delete_brand_modal', 'delete_brand_form', 'showImage');
             const id = document.getElementById('del_id').value;
             const delURL = "{{ route('delete.brand', ':id') }}".replace(':id', id);
             const del_res = await axios.delete(delURL);
-            hiddenModal('delete_brand_modal', 'delete_brand_form')
-            brandList();
+            hideLoader();
+            await brandList();
             if (del_res.status == 200 && del_res.data.status == 'success') {
                 toastr.success(del_res.data.message, "POS Says:");
             }

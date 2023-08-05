@@ -3,9 +3,12 @@
     productList();
     async function productList() {
         try {
-            document.getElementById("product_list").innerHTML = "";
             const URL = "{{ route('products') }}";
             const result = await axios.get(URL);
+
+            // $('.table').DataTable().distroy()
+            $('#product_list').empty();
+
             result.data.forEach((product, key) => {
                 document.getElementById("product_list").innerHTML += `<tr>
                         <td>${(key + 1) < 10 ? "0" + (key + 1) : key + 1}</td>
@@ -21,8 +24,8 @@
                         <td>${product["name"]}</td>
                         <td>${product["price"]}</td>
                         <td>${product["unit"]}</td>
-                        <td>${product["brand_id"]}</td>
-                        <td>${product["category_id"]}</td>
+                        <td>${product["brand"]["name"]}</td>
+                        <td>${product["category"]["name"]}</td>
                         <td>
                             <button class="mr-3 update_product_info" data-id="${product["id"]}" data-name="${product["name"]}" data-price="${product["price"]}" data-unit="${product["unit"]}" data-brand="${product["brand_id"]}" data-category="${product["category_id"]}" data-image="${product["image"]}" >
                                 <img src="{{ asset('assets/img/icons/edit.svg') }}" alt="img">
@@ -63,20 +66,22 @@
                 toastr.info("Price is required", "POS Says:");
             } else if (unit.length == 0) {
                 toastr.info("Unit is required", "POS Says:");
-            } else if (image.size > 0.5 * 1024 * 1024) {
+            } else if (image.size > 1 * 1024 * 1024) {
                 toastr.info(
-                    "You can upload a maximum of 512 KB image.",
+                    "You can upload a maximum of 1 MB image.",
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('add_product_modal', 'add_product_form', 'showImage');
                 const addURL = "{{ route('add.product') }}";
                 const response = await axios.post(addURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('add_product_modal', 'add_product_form', 'showImage')
-                productList();
+                hideLoader();
+                await productList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -105,6 +110,11 @@
         category = $(this).data('category');
         image = $(this).data('image');
 
+        $('#up_id').val(id);
+        $('#up_name').val(name);
+        $('#up_price').val(price);
+        $('#up_unit').val(unit);
+
         // Set the selected option for "Brand"
         $("#up_brand_list option").each(function() {
             if ($(this).val() == brand) {
@@ -123,11 +133,6 @@
             }
         });
 
-        $('#up_id').val(id);
-        $('#up_name').val(name);
-        $('#up_price').val(price);
-        $('#up_unit').val(unit);
-
         $("#showUpImage").attr("src", image ? `{{ asset('storage/product/${image}') }}` :
             "{{ asset('assets/no_image.jpg') }}");
     })
@@ -139,6 +144,7 @@
         try {
             const data = new FormData(edit_product_form);
 
+            const id = data.get("id");
             const name = data.get("name");
             const price = data.get("price");
             const unit = data.get("unit");
@@ -150,20 +156,22 @@
                 toastr.info("Price is required", "POS Says:");
             } else if (unit.length == 0) {
                 toastr.info("Unit is required", "POS Says:");
-            } else if (image.size > 0.5 * 1024 * 1024) {
+            } else if (image.size > 1 * 1024 * 1024) {
                 toastr.info(
-                    "You can upload a maximum of 512 KB image.",
+                    "You can upload a maximum of 1 MB image.",
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('edit_product_modal', 'edit_product_form', 'showImage');
                 const updateURL = "{{ route('update.product', ':id') }}".replace(':id', id);
                 const response = await axios.post(updateURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('edit_product_modal', 'edit_product_form')
-                productList();
+                hideLoader();
+                await productList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -180,16 +188,18 @@
         $('#del_id').val(id);
     })
 
-    //update product listener
+    //delete product listener
     const delete_product_form = document.getElementById("delete_product_form");
     delete_product_form.addEventListener("submit", async (e) => {
         e.preventDefault();
         try {
+            showLoader();
+            hiddenModal('delete_product_modal', 'delete_product_form', 'showImage');
             const id = document.getElementById('del_id').value;
             const delURL = "{{ route('delete.product', ':id') }}".replace(':id', id);
             const del_res = await axios.delete(delURL);
-            hiddenModal('delete_product_modal', 'delete_product_form')
-            productList();
+            hideLoader();
+            await productList();
             if (del_res.status == 200 && del_res.data.status == 'success') {
                 toastr.success(del_res.data.message, "POS Says:");
             }

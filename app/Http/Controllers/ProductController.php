@@ -17,7 +17,7 @@ class ProductController extends Controller {
      * @return Collection
      */
     public function getProducts( Request $request ): Collection {
-        return Product::where( 'user_id', $request->header( 'id' ) )->latest()->get();
+        return Product::where( 'user_id', $request->header( 'id' ) )->with( ['brand', 'category'] )->latest()->get();
     }
 
     /**

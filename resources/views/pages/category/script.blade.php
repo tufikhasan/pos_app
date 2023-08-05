@@ -3,9 +3,11 @@
     categoryList();
     async function categoryList() {
         try {
-            document.getElementById("category_list").innerHTML = "";
             const URL = "{{ route('categories') }}";
             const result = await axios.get(URL);
+
+            $('#category_list').empty();
+
             result.data.forEach((category, key) => {
                 document.getElementById("category_list").innerHTML += `<tr>
                         <td>${(key + 1) < 10 ? "0" + (key + 1) : key + 1}</td>
@@ -31,7 +33,6 @@
             });
         } catch (error) {
             console.log("Internal Server Error");
-            // onclick="showModal('edit_category_modal')"
         }
     }
 
@@ -56,14 +57,16 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('add_category_modal', 'add_category_form', 'showImage');
                 const addURL = "{{ route('add.category') }}";
                 const response = await axios.post(addURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('add_category_modal', 'add_category_form', 'showImage')
-                categoryList();
+                hideLoader();
+                await categoryList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -79,7 +82,7 @@
     // show category value in edit form
     $(document).on('click', '.update_category_info', function(e) {
         showModal('edit_category_modal')
-        let id, name, email, address, phone;
+        let id, name, image;
         id = $(this).data('id');
         name = $(this).data('name');
         image = $(this).data('image');
@@ -110,14 +113,16 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('edit_category_modal', 'edit_category_form', 'showImage');
                 const updateURL = "{{ route('update.category', ':id') }}".replace(':id', id);
                 const response = await axios.post(updateURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('edit_category_modal', 'edit_category_form')
-                categoryList();
+                hideLoader();
+                await categoryList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -134,16 +139,18 @@
         $('#del_id').val(id);
     })
 
-    //update category listener
+    //delete category listener
     const delete_category_form = document.getElementById("delete_category_form");
     delete_category_form.addEventListener("submit", async (e) => {
         e.preventDefault();
         try {
+            showLoader();
+            hiddenModal('delete_category_modal', 'delete_category_form', 'showImage');
             const id = document.getElementById('del_id').value;
             const delURL = "{{ route('delete.category', ':id') }}".replace(':id', id);
             const del_res = await axios.delete(delURL);
-            hiddenModal('delete_category_modal', 'delete_category_form')
-            categoryList();
+            hideLoader();
+            await categoryList();
             if (del_res.status == 200 && del_res.data.status == 'success') {
                 toastr.success(del_res.data.message, "POS Says:");
             }

@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/flowbite.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('assets/css/index.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('dist/tailwind-dist.css') }}" />
+    <link rel="stylesheet" href="{{ asset('assets/css/loader.css') }}">
     <link rel="stylesheet"
         href="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css') }}" />
 </head>
@@ -25,6 +26,11 @@
 <body>
     <div id="global-loader">
         <div class="whirly-loader"></div>
+    </div>
+    <div id="loader" class="LoadingOverlay">
+        <div class="Line-Progress">
+            <div class="indeterminate"></div>
+        </div>
     </div>
 
     <div class="main-wrapper">
@@ -63,6 +69,7 @@
                 });
             } catch (error) {
                 console.log("Something Went Wrong");
+                console.log(error)
             }
         }
         profileInfoShow();

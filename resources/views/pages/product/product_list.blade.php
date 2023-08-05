@@ -89,12 +89,12 @@
                                 <th>Name</th>
                                 <th>Price</th>
                                 <th>Unit</th>
-                                <th>brand_id</th>
-                                <th>category_id</th>
+                                <th>Brand</th>
+                                <th>Category</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="product_list"></tbody>
+                        <tbody id="product_list" class="table_tbody"></tbody>
                     </table>
                 </div>
             </div>

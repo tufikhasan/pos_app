@@ -6,6 +6,9 @@
             document.getElementById("customer_list").innerHTML = "";
             const URL = "{{ route('customers') }}";
             const result = await axios.get(URL);
+
+            $('#customer_list').empty();
+
             result.data.forEach((customer, key) => {
                 document.getElementById("customer_list").innerHTML += `<tr>
                         <td>${(key + 1) < 10 ? "0" + (key + 1) : key + 1}</td>
@@ -36,7 +39,6 @@
             });
         } catch (error) {
             console.log("Internal Server Error");
-            // onclick="showModal('edit_customer_modal')"
         }
     }
 
@@ -71,20 +73,23 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('add_customer_modal', 'add_customer_form', 'showImage')
                 const addURL = "{{ route('add.customer') }}";
                 const response = await axios.post(addURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('add_customer_modal', 'add_customer_form', 'showImage')
-                customerList();
+                hideLoader();
+                await customerList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
             }
         } catch (error) {
             console.log('Internal server error');
+            console.log(error)
         }
     });
 
@@ -94,7 +99,7 @@
     // show customer value in edit form
     $(document).on('click', '.update_customer_info', function(e) {
         showModal('edit_customer_modal')
-        let id, name, email, address, phone;
+        let id, name, email, address, mobile, image;
         id = $(this).data('id');
         name = $(this).data('name');
         email = $(this).data('email');
@@ -139,14 +144,16 @@
                     "POS Says:"
                 );
             } else {
+                showLoader();
+                hiddenModal('edit_customer_modal', 'edit_customer_form')
                 const updateURL = "{{ route('update.customer', ':id') }}".replace(':id', id);
                 const response = await axios.post(updateURL, data, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                hiddenModal('edit_customer_modal', 'edit_customer_form')
-                customerList();
+                hideLoader();
+                await customerList();
                 if (response.status == 200 && response.data.status == 'success') {
                     toastr.success(response.data.message, "POS Says:");
                 }
@@ -163,16 +170,18 @@
         $('#del_id').val(id);
     })
 
-    //update customer listener
+    //delete customer listener
     const delete_customer_form = document.getElementById("delete_customer_form");
     delete_customer_form.addEventListener("submit", async (e) => {
         e.preventDefault();
         try {
+            showLoader();
+            hiddenModal('delete_customer_modal', 'delete_customer_form')
             const id = document.getElementById('del_id').value;
             const delURL = "{{ route('delete.customer', ':id') }}".replace(':id', id);
             const del_res = await axios.delete(delURL);
-            hiddenModal('delete_customer_modal', 'delete_customer_form')
-            customerList();
+            hideLoader();
+            await customerList();
             if (del_res.status == 200 && del_res.data.status == 'success') {
                 toastr.success(del_res.data.message, "POS Says:");
             }

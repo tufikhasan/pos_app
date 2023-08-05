@@ -34,6 +34,19 @@
                     </ul>
                 </li>
                 <li class="submenu">
+                    <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/users1.svg') }}"
+                            class="{{ in_array($route, ['promotion.page']) ? 'active' : '' }}" alt="img"><span>
+                            Promotions</span> <span class="menu-arrow"></span></a>
+                    <ul>
+                        <li><a class="{{ 'promotion.page' == $route ? 'active' : '' }}"
+                                href="{{ route('promotion.page') }}">Promotional Mail</a></li>
+                    </ul>
+                </li>
+
+
+
+
+                <li class="submenu">
                     <a href="javascript:void(0);"><img src="{{ asset('assets/img/icons/sales1.svg') }}"
                             alt="img"><span>
                             Sales</span> <span class="menu-arrow"></span></a>

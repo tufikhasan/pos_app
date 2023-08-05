@@ -79,6 +79,12 @@ $(document).ready(function () {
             },
         });
     }
+
+    if ($(".datatable").length > 0) {
+        $(".datatable").DataTable({ bFilter: false });
+    }
+
+
     function readURL(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
@@ -91,9 +97,6 @@ $(document).ready(function () {
     $("#imgInp").change(function () {
         readURL(this);
     });
-    if ($(".datatable").length > 0) {
-        $(".datatable").DataTable({ bFilter: false });
-    }
     setTimeout(function () {
         $("#global-loader");
         setTimeout(function () {
@@ -645,9 +648,7 @@ async function populateDropdownList(url, elementId) {
         const dropdownElement = document.getElementById(elementId);
 
         data.forEach((item) => {
-            dropdownElement.innerHTML += `<option value="${item["id"]}">${item[
-                "name"
-            ].toUpperCase()}</option>`;
+            dropdownElement.innerHTML += `<option class="text-capitalize" value="${item["id"]}">${item["name"]}</option>`;
         });
     } catch (error) {
         console.log("Something went wrong", error);
