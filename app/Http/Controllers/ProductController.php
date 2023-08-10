@@ -7,7 +7,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class ProductController extends Controller {
@@ -17,7 +16,7 @@ class ProductController extends Controller {
      * @return Collection
      */
     public function getProducts( Request $request ): Collection {
-        return Product::where( 'user_id', $request->header( 'id' ) )->with( ['brand', 'category'] )->latest()->get();
+        return Product::where( 'shop_id', $request->header( 'shop_id' ) )->with( ['user', 'brand', 'category'] )->latest()->get();
     }
 
     /**
@@ -31,33 +30,41 @@ class ProductController extends Controller {
                 'name'        => 'required',
                 'price'       => 'required',
                 'unit'        => 'required',
+                'sku'         => 'required',
+                'stock'       => 'required',
                 'brand_id'    => 'required',
                 'category_id' => 'required',
                 'image'       => ['image', 'max:1024', 'mimes:png,jpg', 'dimensions:between=300,350,300,350'],
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 400 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
             $imageUrl = null;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/product', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/product' ), $imageUrl );
             }
             //add new Product
-            Product::create( [
+            $product = Product::create( [
                 'user_id'     => $request->header( 'id' ),
+                'shop_id'     => $request->header( 'shop_id' ),
+                'sku'         => $request->sku,
                 'name'        => $request->name,
                 'price'       => $request->price,
                 'unit'        => $request->unit,
+                'stock'       => $request->stock,
                 'brand_id'    => $request->brand_id,
                 'category_id' => $request->category_id,
                 'image'       => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Product Created Successfully'], 200 );
+            if ( $product ) {
+                return response()->json( ['status' => 'success', 'message' => 'Product Created Successfully'], 201 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Product Create failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -67,7 +74,7 @@ class ProductController extends Controller {
      * @return Product|null
      */
     public function singeProduct( Request $request ): ?Product {
-        return Product::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+        return Product::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
     }
 
     /**
@@ -81,6 +88,8 @@ class ProductController extends Controller {
                 'name'        => 'required',
                 'price'       => 'required',
                 'unit'        => 'required',
+                'sku'         => 'required',
+                'stock'       => 'required',
                 'brand_id'    => 'required',
                 'category_id' => 'required',
                 'image'       => ['image', 'max:1024', 'mimes:png,jpg', 'dimensions:between=300,350,300,350'],
@@ -89,33 +98,38 @@ class ProductController extends Controller {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 200 );
             }
 
-            $product = Product::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $product = Product::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             $imageUrl = $product->image;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 //delete existing image
                 if ( $imageUrl ) {
-                    if ( Storage::fileExists( 'public/product/' . $imageUrl ) ) {
-                        Storage::delete( 'public/product/' . $imageUrl );
+                    if ( file_exists( public_path( 'upload/product/' . $imageUrl ) ) ) {
+                        unlink( public_path( 'upload/product/' . $imageUrl ) );
                     }
                 }
                 //upload new image
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/product', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/product' ), $imageUrl );
             }
             //Product updated
-            $product->update( [
+            $result = $product->update( [
+                'sku'         => $request->sku,
                 'name'        => $request->name,
                 'price'       => $request->price,
                 'unit'        => $request->unit,
+                'stock'       => $request->sku,
                 'brand_id'    => $request->brand_id,
                 'category_id' => $request->category_id,
                 'image'       => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Product Updated Successfully'], 200 );
+            if ( $result ) {
+                return response()->json( ['status' => 'success', 'message' => 'Product Updated Successfully'], 200 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Product Updated Failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -126,11 +140,11 @@ class ProductController extends Controller {
      */
     public function deleteProduct( Request $request ): JsonResponse {
         try {
-            $product = Product::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $product = Product::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             //delete existing image
             if ( $product->image ) {
-                if ( Storage::fileExists( 'public/product/' . $product->image ) ) {
-                    Storage::delete( 'public/product/' . $product->image );
+                if ( file_exists( public_path( 'upload/product/' . $product->image ) ) ) {
+                    unlink( public_path( 'upload/product/' . $product->image ) );
                 }
             }
             //delete Product
@@ -148,6 +162,6 @@ class ProductController extends Controller {
      * @return View
      */
     public function ProductPage(): View {
-        return view( 'pages.product.product_list' );
+        return view( 'pages.products.products' );
     }
 }

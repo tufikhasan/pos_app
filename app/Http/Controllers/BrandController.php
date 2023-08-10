@@ -7,7 +7,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class BrandController extends Controller {
@@ -17,7 +16,7 @@ class BrandController extends Controller {
      * @return Collection
      */
     public function getBrands( Request $request ): Collection {
-        return Brand::where( 'user_id', $request->header( 'id' ) )->latest()->get();
+        return Brand::where( 'shop_id', $request->header( 'shop_id' ) )->with( 'user' )->latest()->get();
     }
 
     /**
@@ -30,26 +29,30 @@ class BrandController extends Controller {
             $validator = Validator::make( $request->all(), [
                 'name'  => 'required',
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
-            ] );
+            ], ['name.unique' => 'Brand Already exists'] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 400 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
             $imageUrl = null;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/brand', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/brand' ), $imageUrl );
             }
             //add new Brand
-            Brand::create( [
+            $brand = Brand::create( [
                 'user_id' => $request->header( 'id' ),
+                'shop_id' => $request->header( 'shop_id' ),
                 'name'    => $request->name,
                 'image'   => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Brand Created Successfully'], 200 );
+            if ( $brand ) {
+                return response()->json( ['status' => 'success', 'message' => 'Brand Created Successfully'], 201 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Brand Create failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -59,7 +62,7 @@ class BrandController extends Controller {
      * @return Brand|null
      */
     public function singeBrand( Request $request ): ?Brand {
-        return Brand::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+        return Brand::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
     }
 
     /**
@@ -74,32 +77,35 @@ class BrandController extends Controller {
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 200 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
 
-            $brand = Brand::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $brand = Brand::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             $imageUrl = $brand->image;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 //delete existing image
                 if ( $imageUrl ) {
-                    if ( Storage::fileExists( 'public/brand/' . $imageUrl ) ) {
-                        Storage::delete( 'public/brand/' . $imageUrl );
+                    if ( file_exists( public_path( 'upload/brand/' . $imageUrl ) ) ) {
+                        unlink( public_path( 'upload/brand/' . $imageUrl ) );
                     }
                 }
                 //upload new image
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/brand', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/brand' ), $imageUrl );
             }
             //Brand updated
-            $brand->update( [
+            $result = $brand->update( [
                 'name'  => $request->name,
                 'image' => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Brand Updated Successfully'], 200 );
+            if ( $result ) {
+                return response()->json( ['status' => 'success', 'message' => 'Brand Updated Successfully'], 200 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Brand Updated Failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -110,11 +116,11 @@ class BrandController extends Controller {
      */
     public function deleteBrand( Request $request ): JsonResponse {
         try {
-            $brand = Brand::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $brand = Brand::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             //delete existing image
             if ( $brand->image ) {
-                if ( Storage::fileExists( 'public/brand/' . $brand->image ) ) {
-                    Storage::delete( 'public/brand/' . $brand->image );
+                if ( file_exists( public_path( 'upload/brand/' . $brand->image ) ) ) {
+                    unlink( public_path( 'upload/brand/' . $brand->image ) );
                 }
             }
             //delete Brand
@@ -123,7 +129,7 @@ class BrandController extends Controller {
             }
             return response()->json( ['status' => 'failed', 'message' => 'Brand Not Found'], 404 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 200 );
         }
     }
 
@@ -132,6 +138,6 @@ class BrandController extends Controller {
      * @return View
      */
     public function brandPage(): View {
-        return view( 'pages.brand.brand_list' );
+        return view( 'pages.brands.brands' );
     }
 }

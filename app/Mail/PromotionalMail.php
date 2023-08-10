@@ -11,13 +11,10 @@ use Illuminate\Queue\SerializesModels;
 class PromotionalMail extends Mailable {
     use Queueable, SerializesModels;
 
-    // public $sub, $content;
     /**
      * Create a new message instance.
      */
     public function __construct( public $sub, public $content ) {
-        // $this->sub = $sub;
-        // $this->content = $content;
     }
 
     /**

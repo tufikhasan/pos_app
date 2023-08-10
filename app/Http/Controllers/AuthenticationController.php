@@ -2,109 +2,106 @@
 
 namespace App\Http\Controllers;
 
-use App\Helper\JWT_TOKEN;
-use App\Mail\OTPMail;
+use App\Helper\Jwt_token;
+use App\Mail\OtpSendMail;
+use App\Models\Shop;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 
 class AuthenticationController extends Controller {
     /**
-     * Get All Users
-     * @return Collection
-     */
-    public function allUsers(): Collection {
-        return User::latest()->get();
-    }
-
-    /**
-     * Register Page view
+     * Sign Up Page
      * @return View
      */
-    function registerPage(): View {
-        return view( 'pages.auth.register' );
+    public function signUpPage(): View {
+        return view( 'auth.sign_up' );
     }
 
     /**
-     * Registration user
-     * @param Request $request
+     * Sign up
+     * @param Request
      * @return JsonResponse
      */
-    public function registration( Request $request ): JsonResponse {
+    public function signUp( Request $request ): JsonResponse {
         try {
             $validator = Validator::make( $request->all(), [
-                'email' => 'required|email|unique:users,email',
-            ], [
-                'email.unique' => 'Already Have an account',
+                'shop_name' => 'required',
+                'name'      => 'required',
+                'email'     => 'required|email|unique:users,email',
+                'mobile'    => 'required|unique:users,mobile',
+                'password'  => 'required',
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'Failed', 'message' => $validator->errors()], 403 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 200 );
             }
-            User::create(
-                array_merge( $request->only( 'first_name', 'last_name', 'email', 'mobile' ), ['password' => Hash::make( $request->password )] )
-            );
-            return response()->json( ['status' => 'success', 'message' => 'User Registration Successful'], 201 );
 
+            DB::beginTransaction();
+            $shop = Shop::create( $request->only( 'shop_name' ) );
+            User::create( array_merge( $request->only( 'name', 'email', 'mobile' ), ['shop_id' => $shop->id, 'password' => Hash::make( $request->password )] ) );
+            DB::commit();
+            return response()->json( ['status' => 'success', 'message' => 'Registration Successfully'], 201 );
         } catch ( \Throwable $th ) {
-            // Handle other exceptions
-            return response()->json( ['status' => 'failed', 'message' => 'Registration failed'] );
+            DB::rollBack();
+            return response()->json( ['status' => 'failed', 'message' => 'Registration Failed'], 400 );
         }
+
     }
 
     /**
-     * Login Page view
+     * Sign In Page
      * @return View
      */
-    function loginPage(): View {
-        return view( 'pages.auth.login' );
+    public function signInPage(): View {
+        return view( 'auth.sign_in' );
     }
 
     /**
-     * User Login Method
-     * @param Request $request
+     * Sign In
+     * @param Request
      * @return JsonResponse
-     *
      */
-    public function userLogin( Request $request ): JsonResponse {
+    public function signIn( Request $request ): JsonResponse {
         try {
-            $user = User::where( 'email', $request->email )->first();
+            $user = User::where( 'email', $request->credential )->orWhere( 'mobile', $request->credential )->first();
             if ( !$user ) {
-                return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
+                return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Creadintials'], 401 );
             }
 
             if ( Hash::check( $request->password, $user->password ) ) {
-                $token = JWT_TOKEN::create_token( $user->email, $user->id );
-                return response()->json( ['status' => 'success', 'message' => 'Login Successful'], 200 )->cookie( 'token', $token, 60 * 60 * 24 );
-            } else {
-                return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
+                $data = ['id' => $user->id, 'shop_id' => $user->shop_id, 'email' => $user->email, 'role' => $user->role];
+                $token = Jwt_token::generate_token( $data );
+
+                return response()->json( ['status' => 'success', 'message' => 'Successfully Sign In'], 200 )->cookie( 'token', $token, 60 * 60 * 24 );
             }
-
+            return response()->json( ['status' => 'Invalid', 'message' => 'Invalid Credentials'], 401 );
         } catch ( \Throwable $th ) {
-            // Handle other exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
+            return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 401 );
         }
+
     }
 
     /**
-     * User Logout Method
-     * @param Request $request
-     *
+     * Sign Out
+     * @return RedirectResponse
      */
-    public function userLogout() {
-        return redirect()->route( 'login' )->cookie( 'token', '', -1 );
+    public function signout(): RedirectResponse {
+        return redirect()->route( 'signin.page' )->cookie( 'token', '', -1 );
+
     }
 
     /**
-     * Forgot Password Page view
+     * Send OTP Page view
      * @return View
      */
-    function forgetPage(): View {
-        return view( 'pages.auth.forget_password' );
+    function sendOtpPage(): View {
+        return view( 'auth.send_otp' );
     }
 
     /**
@@ -125,25 +122,18 @@ class AuthenticationController extends Controller {
             }
 
             //OTP send
-            Mail::to( $email )->send( new OTPMail( $otp ) );
+            Mail::to( $email )->send( new OtpSendMail( $otp ) );
             //update user table otp
             $user->update( ['otp' => $otp] );
 
-            return response()->json( ['status' => 'success', 'message' => "6 digit otp code send this {$email} email. Please check your mail"], 200 );
+            return response()->json( ['status' => 'success', 'message' => "6 digit otp code send. Please check your mail"], 200 );
 
         } catch ( \Throwable $th ) {
             // Handle other exceptions
-            return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
+            return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 401 );
         }
     }
 
-    /**
-     * Verify OTP Page view
-     * @return View
-     */
-    function verifyOtpPage(): View {
-        return view( 'pages.auth.verify_otp' );
-    }
     /**
      * Show countdown time in verify otp page
      * @return mixed
@@ -163,6 +153,14 @@ class AuthenticationController extends Controller {
             'seconds'      => $seconds,
             'current_time' => $current_time,
         ];
+    }
+
+    /**
+     * Verify OTP Page view
+     * @return View
+     */
+    function verifyOtpPage(): View {
+        return view( 'auth.verify_otp' );
     }
 
     /**
@@ -193,8 +191,8 @@ class AuthenticationController extends Controller {
             //otp update
             $user->update( ['otp' => 0] );
             //create password reset token
-            $reset_token = JWT_TOKEN::reset_token( $email );
-            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully"], 200 )->cookie( 'token', $reset_token, ( 60 * 5 ) ); //expired after 5 minutes
+            $token = Jwt_token::generate_token( ['email' => $user->email], 300 );
+            return response()->json( ['status' => 'success', 'message' => "Your Otp verify Successfully", 'token' => $token], 200 )->cookie( 'reset_token', $token, ( 60 * 3 ) ); //expired after 5 minutes
 
         } catch ( \Throwable $th ) {
             // Handle other exceptions
@@ -207,7 +205,7 @@ class AuthenticationController extends Controller {
      * @return View
      */
     function resetPasswordPage(): View {
-        return view( 'pages.auth.reset_password' );
+        return view( 'auth.reset_password' );
     }
 
     /**
@@ -218,6 +216,7 @@ class AuthenticationController extends Controller {
      */
     public function resetPassword( Request $request ) {
         try {
+
             //Password validation
             $validator = Validator::make( $request->all(), [
                 'password'         => 'required|min:4',
@@ -230,89 +229,11 @@ class AuthenticationController extends Controller {
             $email = $request->header( 'email' );
 
             User::where( 'email', $email )->update( ['password' => Hash::make( $request->password )] );
-            return response()->json( ['status' => 'success', 'message' => 'Password Update Successfully'], 200 )->cookie( 'token', '', -1 );
+            return response()->json( ['status' => 'success', 'message' => 'Password Update Successfully'], 200 )->cookie( 'reset_token', '', -1 );
 
         } catch ( \Throwable $th ) {
             // Handle other exceptions
             return response()->json( ['status' => 'Failed', 'message' => 'Unauthorized'], 500 );
-        }
-    }
-
-    /**
-     * Profile Page view
-     * @return View
-     */
-    function profilePage(): View {
-        return view( 'pages.auth.profile' );
-    }
-
-    /**
-     * Profile Details
-     * @param Request $request
-     * @return object
-     */
-    function profileDetails( Request $request ) {
-        $user = User::where( ['id' => $request->header( 'id' ), 'email' => $request->header( 'email' )] )->first();
-        return $user;
-    }
-    /**
-     * Profile Details update
-     * @param Request $request
-     * @return JsonResponse
-     */
-    function profileUpdate( Request $request ): JsonResponse{
-        User::where( ['id' => $request->header( 'id' ), 'email' => $request->header( 'email' )] )->update( [
-            'first_name' => $request->first_name,
-            'last_name'  => $request->last_name,
-            'mobile'     => $request->mobile,
-        ] );
-        return response()->json( ['status' => 'success', 'message' => 'Profile Update Successfully'], 200 );
-    }
-    /**
-     * Profile Image Update
-     * @param Request $request
-     * @return JsonResponse
-     */
-    function profileImgUpdate( Request $request ): JsonResponse{
-        $user = User::findOrFail( $request->header( 'id' ) );
-
-        $image = $request->file( 'image' );
-        if ( $request->hasFile( 'image' ) ) {
-            $imageUrl = 'upload/avtar/' . hexdec( uniqid() ) . '.' . $image->getClientOriginalExtension();
-
-            if ( $user->image && file_exists( public_path( $user->image ) ) ) {
-                unlink( public_path( $user->image ) );
-            }
-
-            $image->move( public_path( 'upload/avtar' ), $imageUrl );
-            $user->image = $imageUrl;
-            $user->save();
-
-            return response()->json( ['status' => 'success', 'message' => 'Profile Image Updated Successfully'], 200 );
-        }
-        return response()->json( ['status' => 'not-change', 'message' => 'Nothing changes'], 200 );
-    }
-
-    /**
-     * Change Password view
-     * @return View
-     */
-    function changePassword(): View {
-        return view( 'pages.auth.change_password' );
-    }
-    /**
-     * Profile Image Update
-     * @param Request $request
-     * @return JsonResponse
-     */
-    function updatePassword( Request $request ): JsonResponse{
-        $user = User::findOrFail( $request->header( 'id' ) );
-
-        if ( Hash::check( $request->old_password, $user->password ) ) {
-            $user->update( ['password' => Hash::make( $request->new_password )] );
-            return response()->json( ['status' => 'success', 'message' => 'Password Updated Successfully'], 200 );
-        } else {
-            return response()->json( ['status' => 'failed', 'message' => 'OLD Password Not Match'], 200 );
         }
     }
 }

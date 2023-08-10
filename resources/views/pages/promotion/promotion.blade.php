@@ -1,72 +1,60 @@
 @extends('layouts.backend')
 @section('site_title', 'Promotional Mail')
 @section('content')
-    <div class="content">
-        <div class="page-header">
-            <div class="page-title">
-                <h4>Promotional Mail</h4>
-                <h6>Send mail all customers</h6>
-            </div>
-        </div>
-
-        <div class="md:grid md:grid-cols-2 gap-x-6">
-            <div>
-                <div class="card">
-                    <div class="card-body">
-                        <form id="promotion_form">
-                            <div class="form-group">
-                                <label>subject</label>
-                                <input type="text" class="form-control" id="subject">
-                            </div>
-                            <div class="form-group">
-                                <label>Message</label>
-                                <textarea id="message" cols="30" rows="20" class="form-control"></textarea>
-                            </div>
-                            <div class="text-right">
-                                <button type="submit" class="btn btn-primary">Send</button>
-                            </div>
-                        </form>
-                    </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <!-- Card header -->
+                <div class="card-header">
+                    <h3 class="mb-0">Send Mail All Customers</h3>
+                    <p class="text-sm mb-0">
+                        This is an exmaple of datatable using the well known datatables.
+                    </p>
+                </div>
+                <div class="card-body">
+                    <form id="promotion_mail">
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <input type="text" class="form-control" id="subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message Body</label>
+                            <textarea class="form-control" id="message" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Mail</button>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
 @endsection
 @section('script')
     <script>
-        const promotion_form = document.getElementById('promotion_form');
-        promotion_form.addEventListener('submit', async (e) => {
+        const form = document.getElementById('promotion_mail');
+        form.addEventListener('submit', async (e) => {
             e.preventDefault();
             try {
                 const subject = document.getElementById('subject').value;
                 const message = document.getElementById('message').value;
-
-                if (0 == subject.length) {
-                    toastr.info("Subject is Required", "POS Says:");
-                } else if (0 == message.length) {
-                    toastr.info("Message is Required", "POS Says:");
-                } else {
-                    showLoader();
-                    const URL = "{{ route('promotion.mail') }}";
-                    const res = await axios.post(URL, {
-                        subject: subject,
-                        message: message
-                    });
-                    hideLoader();
-
-                    if (200 == res.status && 'success' == res.data.status) {
-                        promotion_form.reset();
-                        toastr.success(res.data.message, "POS Says:");
-                    } else if (200 == res.status && 'failed' == res.data.status) {
-                        promotion_form.reset();
-                        toastr.info(res.data.message, "POS Says:");
-                    }
+                showLoader();
+                const URL = "{{ route('promotion.mail') }}";
+                const response = await axios.post(URL, {
+                    subject: subject,
+                    message: message
+                });
+                hideLoader();
+                if (response.status == 200 && response.data.status == 'success') {
+                    form.reset();
+                    toastr.success(response.data.message);
                 }
-
+                if (response.status == 200 && response.data.status == 'failed') {
+                    toastr.error(response.data.message);
+                }
             } catch (error) {
-                console.log('Something went Wrong');
+                hideLoader();
+                console.log("Something Went Wrong");
             }
-
-        })
+        });
     </script>
 @endsection

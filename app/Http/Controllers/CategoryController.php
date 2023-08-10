@@ -7,7 +7,6 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller {
@@ -17,7 +16,7 @@ class CategoryController extends Controller {
      * @return Collection
      */
     public function getCategories( Request $request ): Collection {
-        return Category::where( 'user_id', $request->header( 'id' ) )->get();
+        return Category::where( 'shop_id', $request->header( 'shop_id' ) )->with( 'user' )->latest()->get();
     }
 
     /**
@@ -29,27 +28,32 @@ class CategoryController extends Controller {
         try {
             $validator = Validator::make( $request->all(), [
                 'name'  => 'required',
+                // 'name'  => 'required|unique:categories,name',
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 400 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
             $imageUrl = null;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/category', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/category' ), $imageUrl );
             }
             //add new category
-            Category::create( [
+            $category = Category::create( [
                 'user_id' => $request->header( 'id' ),
+                'shop_id' => $request->header( 'shop_id' ),
                 'name'    => $request->name,
                 'image'   => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Category Created Successfully'], 200 );
+            if ( $category ) {
+                return response()->json( ['status' => 'success', 'message' => 'Category Created Successfully'], 201 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Category Create failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -59,7 +63,7 @@ class CategoryController extends Controller {
      * @return Category|null
      */
     public function singeCategory( Request $request ): ?Category {
-        return Category::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+        return Category::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
     }
 
     /**
@@ -74,32 +78,35 @@ class CategoryController extends Controller {
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 200 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
 
-            $category = Category::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $category = Category::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             $imageUrl = $category->image;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
                 //delete existing image
                 if ( $imageUrl ) {
-                    if ( Storage::fileExists( 'public/category/' . $imageUrl ) ) {
-                        Storage::delete( 'public/category/' . $imageUrl );
+                    if ( file_exists( public_path( 'upload/category/' . $imageUrl ) ) ) {
+                        unlink( public_path( 'upload/category/' . $imageUrl ) );
                     }
                 }
                 //upload new image
                 $image = $request->file( 'image' );
-                $imageUrl = 'user_' . $request->header( 'id' ) . '_' . date( 'Y_m_d_H_i_s_a' ) . '.' . $image->getClientOriginalExtension();
-                $image->storeAs( 'public/category', $imageUrl );
+                $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
+                $image->move( public_path( 'upload/category' ), $imageUrl );
             }
             //category updated
-            $category->update( [
+            $result = $category->update( [
                 'name'  => $request->name,
                 'image' => $imageUrl,
             ] );
-            return response()->json( ['status' => 'success', 'message' => 'Category Updated Successfully'], 200 );
+            if ( $result ) {
+                return response()->json( ['status' => 'success', 'message' => 'Category Updated Successfully'], 200 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Category Updated Failed'], 200 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -110,11 +117,11 @@ class CategoryController extends Controller {
      */
     public function deleteCategory( Request $request ): JsonResponse {
         try {
-            $category = Category::where( ['id' => $request->id, 'user_id' => $request->header( 'id' )] )->first();
+            $category = Category::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             //delete existing image
             if ( $category->image ) {
-                if ( Storage::fileExists( 'public/category/' . $category->image ) ) {
-                    Storage::delete( 'public/category/' . $category->image );
+                if ( file_exists( public_path( 'upload/category/' . $category->image ) ) ) {
+                    unlink( public_path( 'upload/category/' . $category->image ) );
                 }
             }
             //delete category
@@ -123,7 +130,7 @@ class CategoryController extends Controller {
             }
             return response()->json( ['status' => 'failed', 'message' => 'Category Not Found'], 404 );
         } catch ( \Throwable $th ) {
-            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 500 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 200 );
         }
     }
 
@@ -132,6 +139,6 @@ class CategoryController extends Controller {
      * @return View
      */
     public function categoryPage(): View {
-        return view( 'pages.category.category_list' );
+        return view( 'pages.category.category' );
     }
 }

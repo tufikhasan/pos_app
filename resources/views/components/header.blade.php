@@ -1,215 +1,251 @@
-<div class="header">
-
-    <div class="header-left active">
-        <a href="{{ route('dashboard') }}" class="logo logo-normal">
-            <img src="{{ asset('assets/img/logo.png') }}" alt>
-        </a>
-        <a href="{{ route('dashboard') }}" class="logo logo-white">
-            <img src="{{ asset('assets/img/logo-white.png') }}" alt>
-        </a>
-        <a href="{{ route('dashboard') }}" class="logo-small">
-            <img src="{{ asset('assets/img/logo-small.png') }}" alt>
-        </a>
-        <a id="toggle_btn" href="javascript:void(0);">
-        </a>
-    </div>
-
-    <a id="mobile_btn" class="mobile_btn" href="#sidebar">
-        <span class="bar-icon">
-            <span></span>
-            <span></span>
-            <span></span>
-        </span>
-    </a>
-
-    <ul class="nav user-menu">
-
-        <li class="nav-item">
-            <div class="top-nav-search">
-                <a href="javascript:void(0);" class="responsive-search">
-                    <i class="fa fa-search"></i>
-                </a>
-                <form action="#">
-                    <div class="searchinputs">
-                        <input type="text" placeholder="Search Here ...">
-                        <div class="search-addon">
-                            <span><img src="{{ asset('assets/img/icons/closes.svg') }}" alt="img"></span>
+<!-- Topnav -->
+<nav class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <!-- Search form -->
+            <form class="navbar-search navbar-search-light form-inline mr-sm-3" id="navbar-search-main">
+                <div class="form-group mb-0">
+                    <div class="input-group input-group-alternative input-group-merge">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                        <input class="form-control" placeholder="Search" type="text">
+                    </div>
+                </div>
+                <button type="button" class="close" data-action="search-close" data-target="#navbar-search-main"
+                    aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </form>
+            <!-- Navbar links -->
+            <ul class="navbar-nav align-items-center  ml-md-auto ">
+                <li class="nav-item d-xl-none">
+                    <!-- Sidenav toggler -->
+                    <div class="pr-3 sidenav-toggler sidenav-toggler-dark" data-action="sidenav-pin"
+                        data-target="#sidenav-main">
+                        <div class="sidenav-toggler-inner">
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
+                            <i class="sidenav-toggler-line"></i>
                         </div>
                     </div>
-                    <a class="btn" id="searchdiv"><img src="{{ asset('assets/img/icons/search.svg') }}"
-                            alt="img"></a>
-                </form>
-            </div>
-        </li>
-
-
-        <li class="nav-item dropdown has-arrow flag-nav">
-            <a class="nav-link dropdown-toggle focus:bg-[#eeeeee]" data-dropdown-toggle="dropdown"
-                href="javascript:void(0);" role="button">
-                <img src="{{ asset('assets/img/flags/us1.png') }}" alt height="20">
-            </a>
-            <div id="dropdown"
-                class="hidden dropdown-menu dropdown-menu-right !translate-x-0 !translate-y-0 !top-[60px] bg-white">
-                <a href="javascript:void(0);" class="dropdown-item hover:bg-[#eeeeee]">
-                    <img src="{{ asset('assets/img/flags/us.png') }}" alt height="16"> English
-                </a>
-                <a href="javascript:void(0);" class="dropdown-item hover:bg-[#eeeeee]">
-                    <img src="{{ asset('assets/img/flags/fr.png') }}" alt height="16"> French
-                </a>
-                <a href="javascript:void(0);" class="dropdown-item hover:bg-[#eeeeee]">
-                    <img src="{{ asset('assets/img/flags/es.png') }}" alt height="16"> Spanish
-                </a>
-                <a href="javascript:void(0);" class="dropdown-item hover:bg-[#eeeeee]">
-                    <img src="{{ asset('assets/img/flags/de.png') }}" alt height="16"> German
-                </a>
-            </div>
-        </li>
-
-
-        <li class="nav-item dropdown">
-            <a href="javascript:void(0);" class="dropdown-toggle focus:bg-[#eeeeee] nav-link"
-                data-dropdown-toggle="dropdownNotify">
-                <img src="{{ asset('assets/img/icons/notification-bing.svg') }}" alt="img"> <span
-                    class="badge rounded-pill rounded-full">4</span>
-            </a>
-            <div id="dropdownNotify"
-                class="hidden dropdown-menu notifications !inset-auto !translate-y-0 !right-0 !top-[60px] bg-white">
-                <div class="topnav-dropdown-header">
-                    <span class="notification-title">Notifications</span>
-                    <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
-                </div>
-                <div class="noti-content">
-                    <ul class="notification-list">
-                        <li class="notification-message">
-                            <a href="activities.html">
-                                <div class="media flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt src="{{ asset('assets/img/profiles/avatar-02.jpg') }}">
-                                    </span>
-                                    <div class="media-body flex-grow">
-                                        <p class="noti-details"><span class="noti-title">John Doe</span> added
-                                            new task <span class="noti-title">Patient appointment
-                                                booking</span></p>
-                                        <p class="noti-time"><span class="notification-time">4 mins ago</span>
-                                        </p>
+                </li>
+                <li class="nav-item d-sm-none">
+                    <a class="nav-link" href="#" data-action="search-show" data-target="#navbar-search-main">
+                        <i class="ni ni-zoom-split-in"></i>
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        <i class="ni ni-bell-55"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-xl  dropdown-menu-right  py-0 overflow-hidden">
+                        <!-- Dropdown header -->
+                        <div class="px-3 py-3">
+                            <h6 class="text-sm text-muted m-0">You have <strong class="text-primary">13</strong>
+                                notifications.</h6>
+                        </div>
+                        <!-- List group -->
+                        <div class="list-group list-group-flush">
+                            <a href="#!" class="list-group-item list-group-item-action">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                        <img alt="Image placeholder" src="{{ asset('assets/img/theme/team-1.jpg') }}"
+                                            class="avatar rounded-circle">
+                                    </div>
+                                    <div class="col ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="mb-0 text-sm">John Snow</h4>
+                                            </div>
+                                            <div class="text-right text-muted">
+                                                <small>2 hrs ago</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-0">Let's meet at Starbucks at 11:30. Wdyt?</p>
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                        <li class="notification-message">
-                            <a href="activities.html">
-                                <div class="media flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt src="{{ asset('assets/img/profiles/avatar-03.jpg') }}">
-                                    </span>
-                                    <div class="media-body flex-grow">
-                                        <p class="noti-details"><span class="noti-title">Tarah
-                                                Shropshire</span> changed the task name <span
-                                                class="noti-title">Appointment booking with payment
-                                                gateway</span></p>
-                                        <p class="noti-time"><span class="notification-time">6 mins ago</span>
-                                        </p>
+                            <a href="#!" class="list-group-item list-group-item-action">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                        <img alt="Image placeholder" src="{{ asset('assets/img/theme/team-2.jpg') }}"
+                                            class="avatar rounded-circle">
+                                    </div>
+                                    <div class="col ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="mb-0 text-sm">John Snow</h4>
+                                            </div>
+                                            <div class="text-right text-muted">
+                                                <small>3 hrs ago</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-0">A new issue has been reported for Argon.</p>
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                        <li class="notification-message">
-                            <a href="activities.html">
-                                <div class="media flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt src="{{ asset('assets/img/profiles/avatar-06.jpg') }}">
-                                    </span>
-                                    <div class="media-body flex-grow">
-                                        <p class="noti-details"><span class="noti-title">Misty Tison</span>
-                                            added <span class="noti-title">Domenic Houston</span> and <span
-                                                class="noti-title">Claire Mapes</span> to project <span
-                                                class="noti-title">Doctor available module</span></p>
-                                        <p class="noti-time"><span class="notification-time">8 mins ago</span>
-                                        </p>
+                            <a href="#!" class="list-group-item list-group-item-action">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                        <img alt="Image placeholder" src="{{ asset('assets/img/theme/team-3.jpg') }}"
+                                            class="avatar rounded-circle">
+                                    </div>
+                                    <div class="col ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="mb-0 text-sm">John Snow</h4>
+                                            </div>
+                                            <div class="text-right text-muted">
+                                                <small>5 hrs ago</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-0">Your posts have been liked a lot.</p>
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                        <li class="notification-message">
-                            <a href="activities.html">
-                                <div class="media flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt src="{{ asset('assets/img/profiles/avatar-17.jpg') }}">
-                                    </span>
-                                    <div class="media-body flex-grow">
-                                        <p class="noti-details"><span class="noti-title">Rolland Webber</span>
-                                            completed task <span class="noti-title">Patient and Doctor video
-                                                conferencing</span></p>
-                                        <p class="noti-time"><span class="notification-time">12 mins
-                                                ago</span></p>
+                            <a href="#!" class="list-group-item list-group-item-action">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                        <img alt="Image placeholder" src="{{ asset('assets/img/theme/team-4.jpg') }}"
+                                            class="avatar rounded-circle">
+                                    </div>
+                                    <div class="col ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="mb-0 text-sm">John Snow</h4>
+                                            </div>
+                                            <div class="text-right text-muted">
+                                                <small>2 hrs ago</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-0">Let's meet at Starbucks at 11:30. Wdyt?</p>
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                        <li class="notification-message">
-                            <a href="activities.html">
-                                <div class="media flex">
-                                    <span class="avatar flex-shrink-0">
-                                        <img alt src="{{ asset('assets/img/profiles/avatar-13.jpg') }}">
-                                    </span>
-                                    <div class="media-body flex-grow">
-                                        <p class="noti-details"><span class="noti-title">Bernardo
-                                                Galaviz</span> added new task <span class="noti-title">Private
-                                                chat module</span></p>
-                                        <p class="noti-time"><span class="notification-time">2 days ago</span>
-                                        </p>
+                            <a href="#!" class="list-group-item list-group-item-action">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                        <img alt="Image placeholder" src="{{ asset('assets/img/theme/team-5.jpg') }}"
+                                            class="avatar rounded-circle">
+                                    </div>
+                                    <div class="col ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="mb-0 text-sm">John Snow</h4>
+                                            </div>
+                                            <div class="text-right text-muted">
+                                                <small>3 hrs ago</small>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-0">A new issue has been reported for Argon.</p>
                                     </div>
                                 </div>
                             </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="topnav-dropdown-footer">
-                    <a href="activities.html">View all Notifications</a>
-                </div>
-            </div>
-        </li>
-
-        <li class="nav-item dropdown has-arrow main-drop">
-            <a href="javascript:void(0);" class="dropdown-toggle focus:bg-[#eeeeee] nav-link userset"
-                data-dropdown-toggle="dropdownProfile">
-                <span class="user-img"><img class="profile_picture" src="" alt>
-                    <span class="status online"></span></span>
-            </a>
-            <div id="dropdownProfile"
-                class="hidden dropdown-menu menu-drop-user !inset-auto !translate-y-0 !right-0 !top-[60px] bg-white">
-                <div class="profilename">
-                    <div class="profileset">
-                        <span class="user-img"><img class="profile_picture" src="" alt>
-                            <span class="status online"></span></span>
-                        <div class="profilesets">
-                            <h6 id="user_name"></h6>
-                            <h5>Admin</h5>
+                        </div>
+                        <!-- View all -->
+                        <a href="#!" class="dropdown-item text-center text-primary font-weight-bold py-3">View
+                            all</a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        <i class="ni ni-ungroup"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-dark bg-default  dropdown-menu-right ">
+                        <div class="row shortcuts px-4">
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-red">
+                                    <i class="ni ni-calendar-grid-58"></i>
+                                </span>
+                                <small>Calendar</small>
+                            </a>
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-orange">
+                                    <i class="ni ni-email-83"></i>
+                                </span>
+                                <small>Email</small>
+                            </a>
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-info">
+                                    <i class="ni ni-credit-card"></i>
+                                </span>
+                                <small>Payments</small>
+                            </a>
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-green">
+                                    <i class="ni ni-books"></i>
+                                </span>
+                                <small>Reports</small>
+                            </a>
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-purple">
+                                    <i class="ni ni-pin-3"></i>
+                                </span>
+                                <small>Maps</small>
+                            </a>
+                            <a href="#!" class="col-4 shortcut-item">
+                                <span class="shortcut-media avatar rounded-circle bg-gradient-yellow">
+                                    <i class="ni ni-basket"></i>
+                                </span>
+                                <small>Shop</small>
+                            </a>
                         </div>
                     </div>
-                    <hr class="!m-0">
-                    <a class="dropdown-item" href="{{ route('profile.page') }}"> <i class="mr-2"
-                            data-feather="user"></i>
-                        My Profile</a>
-                    <a class="dropdown-item" href="{{ route('change.password') }}"><i class="mr-2"
-                            data-feather="lock"></i>Change Password</a>
-                    <hr class="!m-0">
-                    <a class="dropdown-item logout !pb-0" href="{{ route('logout') }}"><img
-                            src="{{ asset('assets/img/icons/log-out.svg') }}" class="mr-2"
-                            alt="img">Logout</a>
-                </div>
-            </div>
-        </li>
-    </ul>
-
-
-    <div class="dropdown mobile-user-menu">
-        <a href="javascript:void(0);" class="nav-link dropdown-toggle" data-dropdown-toggle="dropdownMobile"
-            aria-expanded="false"><i class="fa fa-ellipsis-v"></i></a>
-        <div class="hidden dropdown-menu dropdown-menu-right" id="dropdownMobile">
-            <a class="dropdown-item" href="{{ route('profile.page') }}">My Profile</a>
-            <a class="dropdown-item" href="{{ route('change.password') }}">Change Password</a>
-            <a class="dropdown-item" href="{{ route('logout') }}">Logout</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav align-items-center  ml-auto ml-md-0 ">
+                <li class="nav-item dropdown">
+                    <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <div class="media align-items-center">
+                            <span class="avatar avatar-sm rounded-circle">
+                                <img alt="Image placeholder"
+                                    src="{{ !empty($userInfo->image) ? asset("$userInfo->image") : asset('assets/img/no_image.jpg') }}"
+                                    id="tobBarImage">
+                            </span>
+                            <div class="media-body  ml-2  d-none d-lg-block">
+                                <span class="mb-0 text-sm  font-weight-bold"
+                                    id="tobBarName">{{ $userInfo->name }}</span>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu  dropdown-menu-right ">
+                        <div class="dropdown-header noti-title">
+                            <h6 class="text-overflow m-0">Welcome!</h6>
+                        </div>
+                        <a href="{{ route('profile.page') }}" class="dropdown-item">
+                            <i class="ni ni-single-02"></i>
+                            <span>My profile</span>
+                        </a>
+                        <a href="{{ route('change.password') }}" class="dropdown-item">
+                            <i class="ni ni-settings-gear-65"></i>
+                            <span>Change Password</span>
+                        </a>
+                        <a href="#!" class="dropdown-item">
+                            <i class="ni ni-calendar-grid-58"></i>
+                            <span>Activity</span>
+                        </a>
+                        <a href="#!" class="dropdown-item">
+                            <i class="ni ni-support-16"></i>
+                            <span>Support</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ route('signout') }}" class="dropdown-item"
+                            onclick="return confirm('Are you sure logout?')">
+                            <i class="ni ni-user-run"></i>
+                            <span>Logout</span>
+                        </a>
+                    </div>
+                </li>
+            </ul>
         </div>
     </div>
-</div>
+</nav>

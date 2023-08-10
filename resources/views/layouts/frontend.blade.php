@@ -1,44 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <meta name="description" content="POS - Tailwind Admin Template">
-    <meta name="keywords"
-        content="admin, estimates, tailwind, business, corporate, creative, invoice, html5, responsive, Projects">
-    <meta name="author" content="Dreamguys - Tailwind Admin Template">
-    <meta name="robots" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
+    <meta name="author" content="Creative Tim">
     <title>@yield('site_title')</title>
-    <link rel="shortcut icon" type="image/x-icon" href="{{ asset('assets/img/favicon.png') }}">
-    {{-- <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/fontawesome.min.css') }}"> --}}
-    <link rel="stylesheet" href="{{ asset('assets/plugins/fontawesome/css/all.min.css') }}">
-
-    {{-- <link rel="stylesheet" href="{{ asset('assets/css/jquery.dataTables.min.css') }}"> --}}
-    {{-- <link rel="stylesheet" href="{{ asset('assets/css/flowbite.min.css') }}" /> --}}
-    <link rel="stylesheet" href="{{ asset('assets/css/index.min.css') }}" />
-    <link rel="stylesheet" href="{{ asset('dist/tailwind-dist.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" href="{{ asset('assets/img/brand/favicon.png') }}" type="image/png">
+    <!-- Fonts -->
+    <link rel="stylesheet" href="{{ asset('https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700') }}">
+    <!-- Icons -->
+    <link rel="stylesheet" href="{{ asset('assets/vendor/nucleo/css/nucleo.css') }}" type="text/css">
+    <!-- Argon CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/css/argon.css') }}" type="text/css">
     <link rel="stylesheet" href="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/loader.css') }}">
 </head>
 
-<body class="account-page">
+<body class="bg-default">
     <div id="loader" class="LoadingOverlay">
         <div class="Line-Progress">
             <div class="indeterminate"></div>
         </div>
     </div>
-    <div class="main-wrapper">
+    <!-- Main content -->
+    <div class="main-content">
         @yield('content')
     </div>
-
-
-    <script src="{{ asset('assets/js/jquery-3.6.0.min.js') }}"></script>
-    <script src="{{ asset('assets/js/feather.min.js') }}"></script>
-    <script src="{{ asset('assets/js/flowbite.js') }}"></script>
-    <script src="{{ asset('assets/js/alpine.min.js') }}" defer></script>
-    <script src="{{ asset('assets/js/flowbite.js') }}"></script>
-    <script src="{{ asset('assets/js/script.js') }}"></script>
+    <!-- Core -->
+    <script src="{{ asset('assets/vendor/jquery/dist/jquery.min.js') }}"></script>
+    <script src="{{ asset('assets/js/demo.js') }}"></script>
     <script src="{{ asset('https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js') }}"></script>
     <script src="{{ asset('https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js') }}"></script>
     @yield('script')
