@@ -28,11 +28,14 @@ class CategoryController extends Controller {
         try {
             $validator = Validator::make( $request->all(), [
                 'name'  => 'required',
-                // 'name'  => 'required|unique:categories,name',
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
+            }
+            $count = Category::where( ['shop_id' => $request->header( 'shop_id' ), 'name' => $request->name] )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Category Already Exists'], 200 );
             }
             $imageUrl = null;
             //check request image file exists or not
@@ -80,7 +83,10 @@ class CategoryController extends Controller {
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
-
+            $count = Category::where( ['shop_id' => $request->header( 'shop_id' ), 'name' => $request->name] )->whereNot( 'id', $request->id )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Category Already Exists'], 200 );
+            }
             $category = Category::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             $imageUrl = $category->image;
             //check request image file exists or not

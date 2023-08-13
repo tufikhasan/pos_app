@@ -37,7 +37,6 @@ class ProfileController extends Controller {
         try {
             $validator = Validator::make( $request->all(), [
                 'name'  => 'required',
-                'email' => 'required|unique:users,email,' . $request->header( 'id' ) . ',id',
                 'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
@@ -58,7 +57,6 @@ class ProfileController extends Controller {
             }
             $user->update( [
                 'name'   => $request->name,
-                'email'  => $request->email,
                 'mobile' => $request->mobile,
                 'image'  => $imageUrl,
             ] );
@@ -80,7 +78,7 @@ class ProfileController extends Controller {
      * @param Request $request
      * @return JsonResponse
      */
-    function updatePassword( Request $request ): JsonResponse{
+    function updatePassword( Request $request ): JsonResponse {
         $user = User::where( ['id' => $request->header( 'id' ), 'shop_id' => $request->header( 'shop_id' )] )->first();
 
         if ( Hash::check( $request->old_password, $user->password ) ) {

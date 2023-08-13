@@ -37,26 +37,25 @@
                                 id="price">
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="form-control-label" for="brand_id">Brand</label>
-                            <select class="form-control" id="brand_id" name="brand_id">
-                                <option>1</option>
-                                <option>2</option>
+                            <label class="form-control-label" for="brand_list">Brand</label>
+                            <select class="form-control text-uppercase" id="brand_list" name="brand_id">
+                                <option>Select Brand</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
-                            <label class="form-control-label" for="category_id">Category</label>
-                            <select class="form-control" id="category_id" name="category_id">
-                                <option>1</option>
-                                <option>2</option>
+                            <label class="form-control-label" for="category_list">Category</label>
+                            <select class="form-control text-uppercase" id="category_list" name="category_id">
+                                <option>Select Category</option>
                             </select>
                         </div>
                         <div class="col-md-12">
                             <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="image" lang="en"
-                                    oninput="cus_img_preview.src=window.URL.createObjectURL(this.files[0])">
+                                <input type="file" class="custom-file-input" id="image" name="image"
+                                    lang="en"
+                                    oninput="pro_img_preview.src=window.URL.createObjectURL(this.files[0])">
                                 <label class="custom-file-label" for="image"></label>
                             </div>
-                            <img width="70" src="{{ asset('assets/img/no_image.jpg') }}" id="cus_img_preview">
+                            <img width="70" src="{{ asset('assets/img/no_image.jpg') }}" id="pro_img_preview">
                         </div>
                     </div>
                 </div>

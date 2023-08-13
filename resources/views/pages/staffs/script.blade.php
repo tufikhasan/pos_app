@@ -90,11 +90,11 @@
                     password: password,
                 }
                 showLoader();
-                closeModal('#add_staff_modal', 'add_staff_form');
                 const addURL = "{{ route('add.staff') }}";
                 const response = await axios.post(addURL, data);
                 hideLoader();
                 await getStaffs();
+                closeModal('#add_staff_modal', 'add_staff_form');
                 if (response.status == 201 && response.data.status == 'success') {
                     toastr.success(response.data.message);
                 } else if (response.status == 200 && response.data.status == 'failed') {
@@ -173,11 +173,11 @@
                     role: role,
                 }
                 showLoader();
-                closeModal('#edit_staff_modal');
                 const updateURL = "{{ route('update.staff', ':id') }}".replace(':id', id);
                 const response = await axios.patch(updateURL, data);
                 hideLoader();
                 await getStaffs();
+                closeModal('#edit_staff_modal');
                 if (response.status == 200 && response.data.status == 'success') {
                     console.log(response.data.message)
                     toastr.success(response.data.message);

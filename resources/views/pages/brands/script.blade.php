@@ -76,9 +76,9 @@
                     },
                 });
                 hideLoader();
-                closeModal('#add_brand_modal', 'add_brand_form');
                 if (response.status == 201 && response.data.status == 'success') {
                     await getBrands();
+                    closeModal('#add_brand_modal', 'add_brand_form');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {
@@ -148,9 +148,9 @@
                     },
                 });
                 hideLoader();
-                closeModal('#edit_brand_modal');
                 if (response.status == 200 && response.data.status == 'success') {
                     await getBrands();
+                    closeModal('#edit_brand_modal');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {

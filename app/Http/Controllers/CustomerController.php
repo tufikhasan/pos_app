@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -27,15 +28,22 @@ class CustomerController extends Controller {
     public function addCustomer( Request $request ): JsonResponse {
         try {
             $validator = Validator::make( $request->all(), [
-                'name'   => 'required',
-                'email'  => 'required|unique:customers,email',
-                'mobile' => 'unique:customers,mobile',
-                // 'image' => ['image', 'mimes:png,jpg', 'dimensions:min_width=100,min_height=100,max_width=150,max_height=150'],
-                'image'  => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
+                'name'  => 'required',
+                'email' => 'required',
+                'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
+            $count = Customer::where( 'shop_id', $request->header( 'shop_id' ) )
+                ->where( function ( Builder $query ) use ( $request ) {
+                    $query->where( 'mobile', $request->mobile )
+                        ->orWhere( 'email', $request->email );
+                } )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Customer Already Exists'], 200 );
+            }
+
             $imageUrl = null;
             //check request image file exists or not
             if ( $request->file( 'image' ) ) {
@@ -43,6 +51,7 @@ class CustomerController extends Controller {
                 $imageUrl = 'shop_' . $request->header( 'shop_id' ) . '_' . time() . '.' . $image->getClientOriginalExtension();
                 $image->move( public_path( 'upload/customer' ), $imageUrl );
             }
+
             //add new customer
             $cus = Customer::create( [
                 'user_id' => $request->header( 'id' ),
@@ -79,14 +88,22 @@ class CustomerController extends Controller {
     public function updateCustomer( Request $request ): JsonResponse {
         try {
             $validator = Validator::make( $request->all(), [
-                'name'   => 'required',
-                'email'  => 'required|unique:customers,email,' . $request->id . ',id',
-                'mobile' => 'unique:customers,mobile,' . $request->id . ',id',
-                'image'  => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
+                'name'  => 'required',
+                'email' => 'required',
+                'image' => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=100,150,100,150'],
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
+            $count = Customer::where( 'shop_id', $request->header( 'shop_id' ) )->whereNot( 'id', $request->id )
+                ->where( function ( Builder $query ) use ( $request ) {
+                    $query->where( 'mobile', $request->mobile )
+                        ->orWhere( 'email', $request->email );
+                } )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Customer Already Exists'], 200 );
+            }
+
             $customer = Customer::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
             $imageUrl = $customer->image;
             //check request image file exists or not

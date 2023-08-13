@@ -59,6 +59,10 @@
         }
     }
 
+    //show brand list & category list in add form
+    populateDropdownList("{{ route('brands') }}", 'brand_list');
+    populateDropdownList("{{ route('categories') }}", 'category_list');
+
     //add new product listener
     const add_product_modal = document.getElementById("add_product_modal");
     add_product_modal.addEventListener("submit", async (e) => {
@@ -67,20 +71,28 @@
             const data = new FormData(add_product_form);
 
             const name = data.get("name");
-            const email = data.get("email");
-            const mobile = data.get("mobile");
+            const sku = data.get("sku");
+            const unit = data.get("unit");
+            const stock = data.get("stock");
+            const price = data.get("price");
             const image = data.get("image");
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const mobileNumberRegex = /^(\+8801|01)[1-9][0-9]{8}$/;
+            const brand = data.get("brand_id");
+            const category = data.get("category_id");
 
             if (name.length == 0) {
                 toastr.info("Name is required");
-            } else if (email.length == 0) {
-                toastr.info("Email is required");
-            } else if (!emailRegex.test(email)) {
-                toastr.info("Invalid email format");
-            } else if (!mobileNumberRegex.test(mobile) && mobile) {
-                toastr.info("Invalid mobile format");
+            } else if (sku.length == 0) {
+                toastr.info("SKU is required");
+            } else if (unit.length == 0) {
+                toastr.info("Unit is required");
+            } else if (stock.length == 0) {
+                toastr.info("Stock is required");
+            } else if (price.length == 0) {
+                toastr.info("Price is required");
+            } else if (brand.length == 0) {
+                toastr.info("Select Brand if not Exists then create first");
+            } else if (category.length == 0) {
+                toastr.info("Select Category if not Exists then create first");
             } else if (image.size > 0.5 * 1024 * 1024) {
                 toastr.info("You can upload a maximum of 512 KB image.");
             } else {
@@ -92,9 +104,9 @@
                     },
                 });
                 hideLoader();
-                closeModal('#add_product_modal', 'add_product_form');
                 if (response.status == 201 && response.data.status == 'success') {
                     await getProducts();
+                    closeModal('#add_product_modal', 'add_product_form');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {
@@ -103,22 +115,22 @@
             }
         } catch (error) {
             hideLoader();
+            console.log(error)
             if (error.response.status == 400) {
                 toastr.error(error.response.data.message);
             }
             if (error.response.status == 403) {
-                if (error.response.data.message.email) {
-                    toastr.error(error.response.data.message.email);
-                }
-                if (error.response.data.message.mobile) {
-                    toastr.error(error.response.data.message.mobile);
-                }
+                console.log("something went wrong");
             }
         }
 
     });
 
-    async function fillproductEditForm(id) {
+    //show brand list & category list in update form
+    populateDropdownList("{{ route('brands') }}", 'up_brand_list');
+    populateDropdownList("{{ route('categories') }}", 'up_category_list');
+
+    async function fillProductEditForm(id) {
         try {
             const URL = "{{ route('single.product', ':id') }}".replace(':id', id);
             const res = await axios.get(URL);
@@ -126,10 +138,30 @@
 
             document.getElementById('up_id').value = res.data['id'];
             document.getElementById('up_name').value = res.data['name'];
-            document.getElementById('up_email').value = res.data['email'];
-            document.getElementById('up_mobile').value = res.data['mobile'];
-            document.getElementById('up_cus_img_preview').src = image ? "{{ asset('upload/product') }}/" + image :
+            document.getElementById('up_sku').value = res.data['sku'];
+            document.getElementById('up_unit').value = res.data['unit'];
+            document.getElementById('up_stock').value = res.data['stock'];
+            document.getElementById('up_price').value = res.data['price'];
+            document.getElementById('up_pro_img_preview').src = image ? "{{ asset('upload/product') }}/" + image :
                 "{{ asset('assets/img/no_image.jpg') }}";
+
+            // Set the selected option for "Brand"
+            $("#up_brand_list option").each(function() {
+                if ($(this).val() == res.data['brand_id']) {
+                    $(this).attr("selected", true);
+                } else {
+                    $(this).attr("selected", false);
+                }
+            });
+
+            // Set the selected option for "Category"
+            $("#up_category_list option").each(function() {
+                if ($(this).val() == res.data['category_id']) {
+                    $(this).attr("selected", true);
+                } else {
+                    $(this).attr("selected", false);
+                }
+            });
         } catch (error) {
             console.log("Something went wrong")
         }
@@ -138,7 +170,9 @@
     // show product id in edit form
     $(document).on('click', '.edit_product', async function(e) {
         let id = $(this).data('id');
-        await fillproductEditForm(id);
+        showLoader();
+        await fillProductEditForm(id);
+        hideLoader();
         $('#edit_product_modal').modal("show");
     })
 
@@ -151,20 +185,22 @@
 
             const id = data.get("id");
             const name = data.get("name");
-            const email = data.get("email");
-            const mobile = data.get("mobile");
+            const sku = data.get("sku");
+            const unit = data.get("unit");
+            const stock = data.get("stock");
+            const price = data.get("price");
             const image = data.get("image");
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            const mobileNumberRegex = /^(\+8801|01)[1-9][0-9]{8}$/;
 
             if (name.length == 0) {
                 toastr.info("Name is required");
-            } else if (email.length == 0) {
-                toastr.info("Email is required");
-            } else if (!emailRegex.test(email)) {
-                toastr.info("Invalid email format");
-            } else if (!mobileNumberRegex.test(mobile) && mobile) {
-                toastr.info("Invalid mobile format");
+            } else if (sku.length == 0) {
+                toastr.info("SKU is required");
+            } else if (unit.length == 0) {
+                toastr.info("Unit is required");
+            } else if (stock.length == 0) {
+                toastr.info("Stock is required");
+            } else if (price.length == 0) {
+                toastr.info("Price is required");
             } else if (image.size > 0.5 * 1024 * 1024) {
                 toastr.info("You can upload a maximum of 512 KB image.");
             } else {
@@ -176,9 +212,9 @@
                     },
                 });
                 hideLoader();
-                closeModal('#edit_product_modal');
                 if (response.status == 200 && response.data.status == 'success') {
                     await getProducts();
+                    closeModal('#edit_product_modal');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {
@@ -191,18 +227,7 @@
                 toastr.error(error.response.data.message);
             }
             if (error.response.status == 403) {
-                if (error.response.data.message.name) {
-                    toastr.error(error.response.data.message.name);
-                }
-                if (error.response.data.message.email) {
-                    toastr.error(error.response.data.message.email);
-                }
-                if (error.response.data.message.mobile) {
-                    toastr.error(error.response.data.message.mobile);
-                }
-                if (error.response.data.message.image) {
-                    toastr.error(error.response.data.message.image);
-                }
+                console.log("something went wrong");
             }
         }
     });

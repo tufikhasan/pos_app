@@ -88,13 +88,16 @@
                     },
                 });
                 hideLoader();
-                closeModal('#add_customer_modal', 'add_customer_form');
                 if (response.status == 201 && response.data.status == 'success') {
                     await getCustomers();
+                    closeModal('#add_customer_modal', 'add_customer_form');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {
                     toastr.error(response.data.message);
+                }
+                if (response.status == 202 && response.data.status == 'failed') {
+                    console.log(response.data.message);
                 }
             }
         } catch (error) {
@@ -172,9 +175,9 @@
                     },
                 });
                 hideLoader();
-                closeModal('#edit_customer_modal');
                 if (response.status == 200 && response.data.status == 'success') {
                     await getCustomers();
+                    closeModal('#edit_customer_modal');
                     toastr.success(response.data.message);
                 }
                 if (response.status == 200 && response.data.status == 'failed') {

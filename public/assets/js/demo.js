@@ -130,3 +130,18 @@ function closeModal(id, formId = null, outputImageId = null) {
         document.getElementById(outputImageId).src = "../assets/no_image.jpg";
     }
 }
+
+//option value retrives list function
+async function populateDropdownList(url, elementId) {
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+        const dropdownElement = document.getElementById(elementId);
+
+        data.forEach((item) => {
+            dropdownElement.innerHTML += `<option value="${item["id"]}">${item["name"]}</option>`;
+        });
+    } catch (error) {
+        console.log("Something went wrong", error);
+    }
+}

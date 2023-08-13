@@ -6,9 +6,12 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionalMailController;
+use App\Http\Controllers\SaleInvoiceController;
 use App\Http\Controllers\StaffsController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -120,10 +123,10 @@ Route::middleware( 'auth.token' )->group( function () {
 
     Route::controller( ProductController::class )->group( function () {
         //Api Routes
-        Route::delete( '/products/{id}', 'deleteProduct' )->name( 'delete.product' );
-        Route::post( '/products/{id}', 'updateProduct' )->name( 'update.product' );
+        Route::delete( '/products/{id}', 'deleteProduct' )->name( 'delete.product' )->middleware( 'role:admin' );
+        Route::post( '/products/{id}', 'updateProduct' )->name( 'update.product' )->middleware( 'role:admin,manager' );
         Route::get( '/products/{id}', 'singeProduct' )->name( 'single.product' );
-        Route::post( '/products', 'addProduct' )->name( 'add.product' );
+        Route::post( '/products', 'addProduct' )->name( 'add.product' )->middleware( 'role:admin,manager,seller' );
         Route::get( '/products', 'getProducts' )->name( 'products' );
 
         //Page Routes
@@ -134,5 +137,36 @@ Route::middleware( 'auth.token' )->group( function () {
         //Api Routes
         Route::post( '/promotional/mail', 'sendPromotionMail' )->name( 'promotion.mail' )->middleware( 'role:admin,manager' );
         Route::get( '/promotional/mail', 'promotionPage' )->name( 'promotion.page' );
+    } );
+
+    Route::controller( ExpenseCategoryController::class )->group( function () {
+        //Api Routes
+        Route::delete( '/expense/categories/{id}', 'deleteCategory' )->name( 'delete.expense_category' )->middleware( 'role:admin' );
+        Route::post( '/expense/categories/{id}', 'updateCategory' )->name( 'update.expense_category' )->middleware( 'role:admin,manager' );
+        Route::get( '/expense/categories/{id}', 'singeCategory' )->name( 'single.expense_category' );
+        Route::post( '/expense/categories', 'addCategory' )->name( 'add.expense_category' )->middleware( 'role:admin,manager,seller' );
+        Route::get( '/expense/categories', 'getCategories' )->name( 'expense.categories' );
+
+        //Page Routes
+        Route::get( '/expense/category/list', 'categoryPage' )->name( 'expense_category.page' );
+    } );
+
+    Route::controller( ExpenseController::class )->group( function () {
+        //Api Routes
+        Route::delete( '/expenses/{id}', 'deleteExpense' )->name( 'delete.expense' )->middleware( 'role:admin' );
+        Route::patch( '/expenses/{id}', 'updateExpense' )->name( 'update.expense' )->middleware( 'role:admin,manager' );
+        Route::get( '/expenses/{id}', 'singeExpense' )->name( 'single.expense' );
+        Route::post( '/expenses', 'addExpense' )->name( 'add.expense' )->middleware( 'role:admin,manager,seller' );
+        Route::get( '/expenses', 'getExpenses' )->name( 'expenses' );
+
+        //Page Routes
+        Route::get( '/expense/list', 'expensePage' )->name( 'expense.page' );
+    } );
+
+    Route::controller( SaleInvoiceController::class )->group( function () {
+        //Api Routes
+        Route::post( '/sale/invoice', 'createInvoice' )->name( 'create.invoice' )->middleware( 'role:admin,manager,seller' );
+        Route::get( '/sale/invoice/{id}', 'index' )->name( 'single.invoice' );
+        Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
     } );
 } );

@@ -33,6 +33,10 @@ class BrandController extends Controller {
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
             }
+            $count = Brand::where( ['shop_id' => $request->header( 'shop_id' ), 'name' => $request->name] )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Brand Already Exists'], 200 );
+            }
             $imageUrl = null;
             //check request image file exists or not
             if ( $request->hasFile( 'image' ) ) {
@@ -78,6 +82,10 @@ class BrandController extends Controller {
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
+            }
+            $count = Brand::where( ['shop_id' => $request->header( 'shop_id' ), 'name' => $request->name] )->whereNot( 'id', $request->id )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Brand Already Exists'], 200 );
             }
 
             $brand = Brand::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();

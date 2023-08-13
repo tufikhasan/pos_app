@@ -39,7 +39,7 @@
                             <div class="form-group row">
                                 <label for="email" class="col-md-2 col-form-label form-control-label">Email</label>
                                 <div class="col-md-10">
-                                    <input class="form-control" type="email" id="email" name="email">
+                                    <input class="form-control" type="email" id="email" disabled>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -99,18 +99,12 @@
                 const data = new FormData(profile_form);
 
                 const name = data.get("name");
-                const email = data.get("email");
                 const mobile = data.get("mobile");
                 const image = data.get("image");
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 const mobileNumberRegex = /^(\+8801|01)[1-9][0-9]{8}$/;
 
                 if (name.length == 0) {
                     toastr.info("Name is required");
-                } else if (email.length == 0) {
-                    toastr.info("Email is required");
-                } else if (!emailRegex.test(email)) {
-                    toastr.info("Invalid email format");
                 } else if (!mobileNumberRegex.test(mobile) && mobile) {
                     toastr.info("Invalid mobile format");
                 } else if (image.size > 0.5 * 1024 * 1024) {

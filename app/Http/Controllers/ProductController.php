@@ -34,10 +34,14 @@ class ProductController extends Controller {
                 'stock'       => 'required',
                 'brand_id'    => 'required',
                 'category_id' => 'required',
-                'image'       => ['image', 'max:1024', 'mimes:png,jpg', 'dimensions:between=300,350,300,350'],
+                'image'       => ['image', 'max:512', 'mimes:png,jpg', 'dimensions:between=300,350,300,350'],
             ] );
             if ( $validator->fails() ) {
                 return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
+            }
+            $count = Product::where( ['shop_id' => $request->header( 'shop_id' ), 'sku' => $request->sku] )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Product Already Exists'], 200 );
             }
             $imageUrl = null;
             //check request image file exists or not
@@ -95,7 +99,11 @@ class ProductController extends Controller {
                 'image'       => ['image', 'max:1024', 'mimes:png,jpg', 'dimensions:between=300,350,300,350'],
             ] );
             if ( $validator->fails() ) {
-                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 200 );
+                return response()->json( ['status' => 'failed', 'message' => $validator->errors()], 403 );
+            }
+            $count = Product::where( ['shop_id' => $request->header( 'shop_id' ), 'sku' => $request->sku] )->whereNot( 'id', $request->id )->first();
+            if ( $count ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Product Already Exists'], 200 );
             }
 
             $product = Product::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->first();
