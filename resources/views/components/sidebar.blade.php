@@ -77,6 +77,27 @@
                             </div>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link {{ in_array($route, ['sale.page']) ? 'active' : '' }}"
+                                href="#navbar-sales" data-toggle="collapse" role="button"
+                                aria-expanded="{{ in_array($route, ['sale.page']) ? 'true' : 'false' }}"
+                                aria-controls="navbar-sales">
+                                <i class="ni ni-circle-08 text-primary"></i>
+                                <span class="nav-link-text">Sales</span>
+                            </a>
+                            <div class="collapse {{ in_array($route, ['sale.page']) ? 'show' : '' }}"
+                                id="navbar-sales">
+                                <ul class="nav nav-sm flex-column">
+                                    <li class="nav-item">
+                                        <a href="{{ route('sale.page') }}"
+                                            class="nav-link {{ 'sale.page' == $route ? 'active' : '' }}">
+                                            <span class="sidenav-mini-icon"> D </span>
+                                            <span class="sidenav-normal"> Sale </span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link {{ 'staffs.page' == $route ? 'active' : '' }}"
                                 href="{{ route('staffs.page') }}">
                                 <i class="ni ni-circle-08 text-red"></i>

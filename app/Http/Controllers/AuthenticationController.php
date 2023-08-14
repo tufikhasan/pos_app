@@ -6,6 +6,7 @@ use App\Helper\Jwt_token;
 use App\Mail\OtpSendMail;
 use App\Models\Shop;
 use App\Models\User;
+use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -92,6 +93,7 @@ class AuthenticationController extends Controller {
      * @return RedirectResponse
      */
     public function signout(): RedirectResponse {
+        Cart::destroy();
         return redirect()->route( 'signin.page' )->cookie( 'token', '', -1 );
 
     }

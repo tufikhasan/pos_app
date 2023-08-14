@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SaleInvoice;
+use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -76,5 +78,64 @@ class SaleInvoiceController extends Controller {
             'products' => $products,
         ];
 
+    }
+
+    /**
+     * Sale Page
+     * @return View
+     */
+    public function salePage(): View {
+        return view( 'pages.sales.sale' );
+    }
+
+    /**
+     * Add to cart product
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function addToCart( Request $request ): JsonResponse {
+        try {
+            $added = Cart::add( [
+                'id'    => $request->id,
+                'name'  => $request->name,
+                'qty'   => 1,
+                'price' => $request->price,
+            ] );
+            if ( $added ) {
+                return response()->json( ['status' => 'success', 'message' => 'Product Addded Successfully'], 201 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => 'Product Addded failed'], 200 );
+        } catch ( \Throwable $th ) {
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
+        }
+    }
+
+    /**
+     * Product Quantity update
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function updateCartQty( Request $request ): JsonResponse {
+        try {
+            Cart::update( $request->rowId, $request->update_qty );
+            return response()->json( ['status' => 'success', 'message' => 'Product Quantity Updated Successfully'], 200 );
+        } catch ( \Throwable $th ) {
+            // return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
+            return response()->json( ['status' => 'failed', 'message' => $th->getMessage()], 400 );
+        }
+    }
+
+    /**
+     * Product Remove From cart
+     * @param Request $request
+     * @return JsonResponse
+     */
+    function deleteFromCart( Request $request ): JsonResponse {
+        try {
+            Cart::remove( $request->rowId );
+            return response()->json( ['status' => 'success', 'message' => 'Product Remove From Cart Successfully'], 200 );
+        } catch ( \Throwable $th ) {
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
+        }
     }
 }
