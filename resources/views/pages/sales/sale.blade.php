@@ -11,7 +11,7 @@
         <div class="col-md-6 mt-md-3">
             <div class="input-group mb-3">
                 <select class="form-control" id="customer_select">
-                    <option>Select Customer</option>
+                    <option value="0">Select Customer</option>
                 </select>
                 <div class="input-group-append">
                     <button class="btn btn-primary" type="button" data-toggle="modal" data-target="#add_cus_modal"><i
@@ -22,8 +22,8 @@
             @php
                 $saleProducts = Cart::content();
             @endphp
-            <div class="table-responsive cart_items">
-                <table class="table">
+            <div class="table-responsive cart_table">
+                <table class="table cart_items">
                     <thead class="thead-dark">
                         <tr>
                             <th>Name</th>
@@ -61,7 +61,8 @@
                     @empty
                         <tbody>
                             <tr>
-                                <td class="align-middle text-center text-danger font-weight-600" colspan="5">No Item in
+                                <td class="align-middle text-center text-danger font-weight-600" colspan="5">No Item
+                                    in
                                     cart
                                 </td>
                             </tr>
@@ -69,23 +70,26 @@
                     @endforelse
                 </table>
             </div>
-            <div class="card bg-info cart_total">
-                <div class="card-body">
+            <div class="card bg-info">
+                <div class="card-body cart_total">
                     <h4 class="text-white d-flex justify-content-between"><span>Sub
                             Total</span><span>{{ Cart::subtotal() }}</span></h4>
-                    <h4 class="text-white d-flex justify-content-between"><span>Tax</span><span>{{ Cart::tax() }}</span>
+                    <h4 class="text-white d-flex justify-content-between">
+                        <span>Tax</span><span>{{ Cart::tax() }}</span>
                     </h4>
-                    <h4 class="text-white d-flex justify-content-between"><span>Discount</span><span>0</span></h4>
-                    <hr class="m-0">
-                    <h4 class="text-white d-flex justify-content-between"><span>Total</span><span>=
+                    <h4 class="text-white d-flex justify-content-between align-items-center">
+                        <span>Discount</span>
+                        <span>0</span>
+                    </h4>
+                    <hr class="my-1">
+                    <h4 class="text-white d-flex justify-content-between"><span>Total</span><span id="total_with_dis">=
                             {{ Cart::total() }}</span></h4>
 
                 </div>
             </div>
             <div class="text-center">
-                <button type="button" class="btn btn-success">Create Invoice</button>
+                <button type="button" class="btn btn-success" id="invoice_create">Create Invoice</button>
             </div>
-
         </div>
         <div class="col-md-6">
             <div class="table-responsive py-4">
@@ -238,8 +242,8 @@
 
         function reloadContent() {
             $('.cart_count').load(location.href + ' .cart_count');
-            $('.cart_items').load(location.href + ' .cart_items');
-            $('.cart_total').load(location.href + ' .cart_total');
+            $('.cart_table').load(location.href + ' .cart_items');
+            $('.card').load(location.href + ' .cart_total');
         }
 
 
@@ -323,5 +327,39 @@
             }
 
         })
+
+
+        //invoice create
+        const invoice_create = document.getElementById("invoice_create");
+        invoice_create.addEventListener("click", async () => {
+            try {
+                const customer_id = document.getElementById("customer_select").value;
+                if (customer_id == 0) {
+                    toastr.error("Please Select a Customer");
+                } else {
+                    showLoader();
+                    const addURL = "{{ route('create.invoice') }}";
+                    const response = await axios.post(addURL, {
+                        customer_id: customer_id
+                    });
+                    hideLoader();
+                    if (response.status == 201 && response.data.status == 'success') {
+                        reloadContent()
+                        toastr.success(response.data.message);
+                        // location.href = "{{ route('invoice.details', ':id') }}".replace(':id', response.data.id);
+                        // Open a new tab with the generated URL
+                        window.open("{{ route('invoice.details', ':id') }}".replace(':id', response.data.id),
+                            '_blank');
+                    }
+                    if (response.status == 200 && response.data.status == 'failed') {
+                        toastr.error(response.data.message);
+                    }
+                }
+            } catch (error) {
+                hideLoader();
+                console.log("Something went Wrong")
+            }
+
+        });
     </script>
 @endsection

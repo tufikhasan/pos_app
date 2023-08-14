@@ -8,11 +8,11 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void{
+    public function up(): void {
         Schema::create( 'categories', function ( Blueprint $table ) {
             $table->id();
-            $table->foreignId( 'user_id' )->constrained();
-            $table->foreignId( 'shop_id' )->constrained();
+            $table->foreignId( 'user_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'shop_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->string( 'name' );
             $table->string( 'image' )->nullable();
             $table->timestamp( 'created_at' )->useCurrent();
@@ -23,7 +23,7 @@ return new class extends Migration {
     /**
      * Reverse the migrations.
      */
-    public function down(): void{
+    public function down(): void {
         Schema::dropIfExists( 'categories' );
     }
 };

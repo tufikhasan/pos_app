@@ -8,7 +8,7 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
-    public function up(): void{
+    public function up(): void {
         Schema::create( 'products', function ( Blueprint $table ) {
             $table->id();
             $table->string( 'name' );
@@ -17,10 +17,10 @@ return new class extends Migration {
             $table->string( 'sku' );
             $table->string( 'stock' );
             $table->string( 'image' )->nullable();
-            $table->foreignId( 'brand_id' )->constrained();
-            $table->foreignId( 'category_id' )->constrained();
-            $table->foreignId( 'user_id' )->constrained();
-            $table->foreignId( 'shop_id' )->constrained();
+            $table->foreignId( 'brand_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'category_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'user_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'shop_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->timestamp( 'created_at' )->useCurrent();
             $table->timestamp( 'updated_at' )->useCurrent()->useCurrentOnUpdate();
         } );
@@ -29,7 +29,7 @@ return new class extends Migration {
     /**
      * Reverse the migrations.
      */
-    public function down(): void{
+    public function down(): void {
         Schema::dropIfExists( 'products' );
     }
 };

@@ -12,8 +12,8 @@ return new class extends Migration {
         Schema::create( 'expense_categories', function ( Blueprint $table ) {
             $table->id();
             $table->string( 'name' );
-            $table->foreignId( 'user_id' )->constrained();
-            $table->foreignId( 'shop_id' )->constrained();
+            $table->foreignId( 'user_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'shop_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
             $table->timestamp( 'created_at' )->useCurrent();
             $table->timestamp( 'updated_at' )->useCurrent()->useCurrentOnUpdate();
         } );

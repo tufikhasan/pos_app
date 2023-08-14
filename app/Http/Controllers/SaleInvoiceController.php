@@ -12,75 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class SaleInvoiceController extends Controller {
     /**
-     * Sales Invoice Create
-     * @param Request $request
-     * @return JsonResponse
-     */
-    public function createInvoice( Request $request ): JsonResponse {
-        try {
-            DB::beginTransaction();
-            $invoice = SaleInvoice::create( array_merge(
-                ['user_id' => $request->header( 'id' ), 'shop_id' => $request->header( 'shop_id' )],
-                $request->only( 'customer_id', 'total', 'discount', 'tax' )
-            ) );
-
-            foreach ( $request->products as $product ) {
-                Sale::create( [
-                    'sale_invoice_id' => $invoice->id,
-                    'user_id'         => $request->header( 'id' ),
-                    'shop_id'         => $request->header( 'shop_id' ),
-                    'product_id'      => $product['product_id'],
-                    'qty'             => $product['qty'],
-                    'price'           => $product['price'],
-                ] );
-            }
-            DB::commit();
-            return response()->json( ['status' => 'success', 'message' => 'Invoice Create Successfully'], 201 );
-        } catch ( \Throwable $th ) {
-            DB::rollBack();
-            return response()->json( ['status' => 'failed', 'message' => 'Invoice Create Failed'], 200 );
-        }
-    }
-
-    /**
-     * Single Invoice
-     * @param Request $request
-     * @return object
-     */
-    public function index( Request $request ): object {
-        return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( 'customer' )->first();
-    }
-
-    /**
-     * Invoice Details
-     * @param Request $request
-     * @return array
-     */
-    public function invoiceDetails( Request $request ): array{
-        // return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
-
-        $result = SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
-        $products = [];
-        foreach ( $result->sale_products as $product ) {
-            $products[] = ['qty' => $product->qty, 'price' => $product->price];
-        }
-        return [
-            'invoice'  => [
-                'id'       => $result->id,
-                'discount' => $result->discount,
-                'tax'      => $result->tax,
-                'total'    => $result->total,
-            ],
-            'customer' => [
-                'name'  => $result->customer->name,
-                'email' => $result->customer->email,
-            ],
-            'products' => $products,
-        ];
-
-    }
-
-    /**
      * Sale Page
      * @return View
      */
@@ -137,5 +68,82 @@ class SaleInvoiceController extends Controller {
         } catch ( \Throwable $th ) {
             return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
+    }
+
+    /**
+     * Sales Invoice Create
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function createInvoice( Request $request ): JsonResponse {
+        try {
+            DB::beginTransaction();
+
+            $invoice = SaleInvoice::create( [
+                'user_id'     => $request->header( 'id' ),
+                'shop_id'     => $request->header( 'shop_id' ),
+                'customer_id' => $request->customer_id,
+                'total_qty'   => Cart::count(),
+                'sub_total'   => Cart::subtotal(),
+                'tax'         => Cart::tax(),
+                'total'       => Cart::total(),
+            ] );
+
+            foreach ( Cart::content() as $key => $product ) {
+                Sale::create( [
+                    'sale_invoice_id' => $invoice->id,
+                    'user_id'         => $invoice->user_id,
+                    'shop_id'         => $invoice->shop_id,
+                    'product_id'      => $product->id,
+                    'qty'             => $product->qty,
+                    'name'            => $product->name,
+                    'price'           => $product->price,
+                ] );
+            }
+            DB::commit();
+            Cart::destroy();
+            return response()->json( ['status' => 'success', 'message' => 'Invoice Create Successfully', 'id' => $invoice->id], 201 );
+        } catch ( \Throwable $th ) {
+            // DB::rollBack();
+            return response()->json( ['status' => 'failed', 'message' => $th->getMessage()], 200 );
+        }
+    }
+
+    /**
+     * Single Invoice
+     * @param Request $request
+     * @return object
+     */
+    public function index( Request $request ): object {
+        return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( 'customer' )->first();
+    }
+
+    /**
+     * Invoice Details
+     * @param Request $request
+     * @return array
+     */
+    public function invoiceDetails( Request $request ): array{
+        // return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
+
+        $result = SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
+        $products = [];
+        foreach ( $result->sale_products as $product ) {
+            $products[] = ['qty' => $product->qty, 'price' => $product->price];
+        }
+        return [
+            'invoice'  => [
+                'id'       => $result->id,
+                'discount' => $result->discount,
+                'tax'      => $result->tax,
+                'total'    => $result->total,
+            ],
+            'customer' => [
+                'name'  => $result->customer->name,
+                'email' => $result->customer->email,
+            ],
+            'products' => $products,
+        ];
+
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model {
     use HasFactory;
-    protected $fillable = ['user_id', 'shop_id', 'sale_invoice_id', 'product_id', 'qty', 'price'];
+    protected $fillable = ['user_id', 'shop_id', 'sale_invoice_id', 'product_id', 'qty', 'name', 'price'];
 
     // public function sale_invoice(): BelongsTo {
     //     return $this->belongsTo( SaleInvoice::class );

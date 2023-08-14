@@ -12,12 +12,13 @@ return new class extends Migration {
         Schema::create( 'sales', function ( Blueprint $table ) {
             $table->id();
 
-            $table->foreignId( 'user_id' )->constrained();
-            $table->foreignId( 'shop_id' )->constrained();
-            $table->foreignId( 'sale_invoice_id' )->constrained();
-            $table->foreignId( 'product_id' )->constrained();
+            $table->foreignId( 'user_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'shop_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'sale_invoice_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
+            $table->foreignId( 'product_id' )->constrained()->cascadeOnUpdate()->restrictOnDelete();
 
             $table->string( 'qty' );
+            $table->string( 'name' );
             $table->string( 'price' );
 
             $table->timestamp( 'created_at' )->useCurrent();

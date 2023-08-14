@@ -164,14 +164,13 @@ Route::middleware( 'auth.token' )->group( function () {
     } );
 
     Route::controller( SaleInvoiceController::class )->group( function () {
-        //Api Routes
-        Route::post( '/sale/invoice', 'createInvoice' )->name( 'create.invoice' )->middleware( 'role:admin,manager,seller' );
-        Route::get( '/sale/invoice/{id}', 'index' )->name( 'single.invoice' );
-        Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
-
         Route::get( '/sale', 'salePage' )->name( 'sale.page' );
         Route::post( '/sale', 'addToCart' )->name( 'add.cart' );
         Route::patch( '/sale/{rowId}', 'updateCartQty' )->name( 'update.cart' );
         Route::delete( '/sale/{rowId}', 'deleteFromCart' )->name( 'remove.cart' );
+
+        Route::post( '/sale/invoice', 'createInvoice' )->name( 'create.invoice' )->middleware( 'role:admin,manager,seller' );
+        Route::get( '/sale/invoice/{id}', 'index' )->name( 'single.invoice' );
+        Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
     } );
 } );
