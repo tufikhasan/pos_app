@@ -1,11 +1,14 @@
-01: Install the package
-composer require hardevine/shoppingcart
+//Printer documentation
+@media print {
+    body * {
+        display: none;
+    }
 
-02: open your config/app.php file. Add a new line to the providers array.
-Gloudemans\Shoppingcart\ShoppingcartServiceProvider::class
-
-03: open your config/app.php file. And optionally add a new line to the aliases array.
-'Cart' => Gloudemans\Shoppingcart\Facades\Cart::class,
-
-04: Laravel will publish a config file config/cart.php where you can set the tax rate.
-php artisan vendor:publish --provider="Gloudemans\Shoppingcart\ShoppingcartServiceProvider" --tag="config"
+    #content,
+    #content * {
+        display: block;
+    }
+}
+document.getElementById('print_invoice').addEventListener('click', () => {
+    print();
+})

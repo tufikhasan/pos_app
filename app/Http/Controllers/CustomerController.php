@@ -40,8 +40,8 @@ class CustomerController extends Controller {
                     $query->where( 'mobile', $request->mobile )
                         ->orWhere( 'email', $request->email );
                 } )->first();
-            if ( $count ) {
-                return response()->json( ['status' => 'failed', 'message' => 'Customer Already Exists'], 200 );
+            if ( $count == 1 ) {
+                return response()->json( ['status' => 'failed', 'message' => 'Customer Already Exists.'], 200 );
             }
 
             $imageUrl = null;

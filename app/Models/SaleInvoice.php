@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class SaleInvoice extends Model {
     use HasFactory;
     protected $fillable = ['user_id', 'shop_id', 'customer_id', 'total_qty', 'sub_total', 'tax', 'discount', 'total'];
+    public function shop(): BelongsTo {
+        return $this->belongsTo( Shop::class );
+    }
     public function customer(): BelongsTo {
         return $this->belongsTo( Customer::class );
     }

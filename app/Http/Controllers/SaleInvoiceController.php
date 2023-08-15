@@ -89,6 +89,10 @@ class SaleInvoiceController extends Controller {
                 'total'       => Cart::total(),
             ] );
 
+            if ( count( Cart::content() ) == 0 ) {
+                return response()->json( ['status' => 'failed', 'message' => "Cart is empty"], 200 );
+            }
+
             foreach ( Cart::content() as $key => $product ) {
                 Sale::create( [
                     'sale_invoice_id' => $invoice->id,
@@ -105,7 +109,7 @@ class SaleInvoiceController extends Controller {
             return response()->json( ['status' => 'success', 'message' => 'Invoice Create Successfully', 'id' => $invoice->id], 201 );
         } catch ( \Throwable $th ) {
             // DB::rollBack();
-            return response()->json( ['status' => 'failed', 'message' => $th->getMessage()], 200 );
+            return response()->json( ['status' => 'failed', 'message' => "Invoice Create Failed"], 200 );
         }
     }
 
@@ -121,29 +125,25 @@ class SaleInvoiceController extends Controller {
     /**
      * Invoice Details
      * @param Request $request
-     * @return array
+     * @return View
      */
-    public function invoiceDetails( Request $request ): array{
-        // return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
-
-        $result = SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['customer', 'sale_products'] )->first();
+    public function invoiceDetails( Request $request ): View {
+        $result = SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( ['shop', 'customer', 'sale_products'] )->first();
         $products = [];
         foreach ( $result->sale_products as $product ) {
-            $products[] = ['qty' => $product->qty, 'price' => $product->price];
+            $products[] = ['name' => $product->name, 'qty' => $product->qty, 'price' => $product->price];
         }
-        return [
-            'invoice'  => [
-                'id'       => $result->id,
-                'discount' => $result->discount,
-                'tax'      => $result->tax,
-                'total'    => $result->total,
-            ],
-            'customer' => [
-                'name'  => $result->customer->name,
-                'email' => $result->customer->email,
-            ],
-            'products' => $products,
+        $invoice = [
+            'id'        => $result->id,
+            'total_qty' => $result->total_qty,
+            'sub_total' => $result->sub_total,
+            'tax'       => $result->tax,
+            'total'     => $result->total,
+            'date'      => $result->created_at,
         ];
+        $customer = $result->customer->name;
+        $shop = $result->shop->shop_name;
+        return view( 'pages.invoice.invoice_template', compact( 'invoice', 'customer', 'products', 'shop' ) );
 
     }
 }
