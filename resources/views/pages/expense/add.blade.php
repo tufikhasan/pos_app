@@ -19,7 +19,9 @@
                 </div>
                 <div class="form-group">
                     <label for="expense_category_select">Expense Category</label>
-                    <select class="form-control" id="expense_category_select"></select>
+                    <select class="form-control" id="expense_category_select">
+                        <option value="0">Select Category</option>
+                    </select>
                 </div>
             </div>
             <div class="modal-footer">

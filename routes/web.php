@@ -11,6 +11,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionalMailController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleInvoiceController;
 use App\Http\Controllers\StaffsController;
 use App\Models\User;
@@ -76,15 +77,6 @@ Route::middleware( 'auth.token' )->group( function () {
         Route::patch( '/change/password', 'updatePassword' )->name( 'password.update' );
     } );
 
-    Route::controller( StaffsController::class )->group( function () {
-        Route::get( '/staffs/page', 'staffsPage' )->name( 'staffs.page' );
-        Route::get( '/staffs', 'allStaffs' )->name( 'staffs' );
-        Route::get( '/staffs/{id}', 'singleStaff' )->name( 'single.staff' );
-        Route::post( '/staffs', 'addStaff' )->name( 'add.staff' )->middleware( 'role:admin,manager' );
-        Route::patch( '/staffs/{id}', 'updateStaff' )->name( 'update.staff' )->middleware( 'role:admin,manager' );
-        Route::delete( '/staffs/{id}', 'deleteStaff' )->name( 'delete.staff' )->middleware( 'role:admin' );
-    } );
-
     Route::controller( CustomerController::class )->group( function () {
         //Api Routes
         Route::delete( '/customers/{id}', 'deleteCustomer' )->name( 'delete.customer' )->middleware( 'role:admin' );
@@ -133,10 +125,26 @@ Route::middleware( 'auth.token' )->group( function () {
         Route::get( '/product/list', 'productPage' )->name( 'product.page' );
     } );
 
-    Route::controller( PromotionalMailController::class )->group( function () {
-        //Api Routes
-        Route::post( '/promotional/mail', 'sendPromotionMail' )->name( 'promotion.mail' )->middleware( 'role:admin,manager' );
-        Route::get( '/promotional/mail', 'promotionPage' )->name( 'promotion.page' );
+    Route::controller( SaleInvoiceController::class )->group( function () {
+        Route::get( '/sale', 'salePage' )->name( 'sale.page' );
+        Route::post( '/sale', 'addToCart' )->name( 'add.cart' );
+        Route::patch( '/sale/{rowId}', 'updateCartQty' )->name( 'update.cart' );
+        Route::delete( '/sale/{rowId}', 'deleteFromCart' )->name( 'remove.cart' );
+
+        Route::post( '/sale/invoice', 'createInvoice' )->name( 'create.invoice' )->middleware( 'role:admin,manager,seller' );
+        Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
+        Route::get( '/invoices', 'invoiceList' )->name( 'invoice.list' );
+        Route::get( '/invoice/list', 'allInvoice' )->name( 'all.invoice' );
+        Route::delete( '/delete/invoice/{id}', 'deleteInvoice' )->name( 'delete.invoice' );
+    } );
+
+    Route::controller( StaffsController::class )->group( function () {
+        Route::get( '/staffs/page', 'staffsPage' )->name( 'staffs.page' );
+        Route::get( '/staffs', 'allStaffs' )->name( 'staffs' );
+        Route::get( '/staffs/{id}', 'singleStaff' )->name( 'single.staff' );
+        Route::post( '/staffs', 'addStaff' )->name( 'add.staff' )->middleware( 'role:admin,manager' );
+        Route::patch( '/staffs/{id}', 'updateStaff' )->name( 'update.staff' )->middleware( 'role:admin,manager' );
+        Route::delete( '/staffs/{id}', 'deleteStaff' )->name( 'delete.staff' )->middleware( 'role:admin' );
     } );
 
     Route::controller( ExpenseCategoryController::class )->group( function () {
@@ -163,14 +171,13 @@ Route::middleware( 'auth.token' )->group( function () {
         Route::get( '/expense/list', 'expensePage' )->name( 'expense.page' );
     } );
 
-    Route::controller( SaleInvoiceController::class )->group( function () {
-        Route::get( '/sale', 'salePage' )->name( 'sale.page' );
-        Route::post( '/sale', 'addToCart' )->name( 'add.cart' );
-        Route::patch( '/sale/{rowId}', 'updateCartQty' )->name( 'update.cart' );
-        Route::delete( '/sale/{rowId}', 'deleteFromCart' )->name( 'remove.cart' );
+    Route::controller( ReportController::class )->group( function () {
+        Route::get( '/reports', 'getReport' )->name( 'report.page' );
+    } );
 
-        Route::post( '/sale/invoice', 'createInvoice' )->name( 'create.invoice' )->middleware( 'role:admin,manager,seller' );
-        Route::get( '/sale/invoice/{id}', 'index' )->name( 'single.invoice' );
-        Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
+    Route::controller( PromotionalMailController::class )->group( function () {
+        //Api Routes
+        Route::post( '/promotional/mail', 'sendPromotionMail' )->name( 'promotion.mail' )->middleware( 'role:admin,manager' );
+        Route::get( '/promotional/mail', 'promotionPage' )->name( 'promotion.page' );
     } );
 } );

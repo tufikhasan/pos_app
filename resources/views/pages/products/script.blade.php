@@ -89,9 +89,9 @@
                 toastr.info("Stock is required");
             } else if (price.length == 0) {
                 toastr.info("Price is required");
-            } else if (brand.length == 0) {
+            } else if (brand == 0) {
                 toastr.info("Select Brand if not Exists then create first");
-            } else if (category.length == 0) {
+            } else if (category == 0) {
                 toastr.info("Select Category if not Exists then create first");
             } else if (image.size > 0.5 * 1024 * 1024) {
                 toastr.info("You can upload a maximum of 512 KB image.");
@@ -201,6 +201,10 @@
                 toastr.info("Stock is required");
             } else if (price.length == 0) {
                 toastr.info("Price is required");
+            } else if (brand == 0) {
+                toastr.info("Select Brand if not Exists then create first");
+            } else if (category == 0) {
+                toastr.info("Select Category if not Exists then create first");
             } else if (image.size > 0.5 * 1024 * 1024) {
                 toastr.info("You can upload a maximum of 512 KB image.");
             } else {

@@ -71,6 +71,8 @@
                 toastr.info("Expense Amount is Required");
             } else if (0 == description.length) {
                 toastr.info("Expense Description is Required");
+            } else if (0 == expense_category_id) {
+                toastr.info("Expense Category is Required");
             } else {
                 showLoader();
                 const data = {
@@ -142,6 +144,8 @@
                 toastr.info("Expense Amount is Required");
             } else if (0 == description.length) {
                 toastr.info("Expense Description is Required");
+            } else if (0 == expense_category_id) {
+                toastr.info("Expense Category is Required");
             } else {
                 const data = {
                     amount: amount,

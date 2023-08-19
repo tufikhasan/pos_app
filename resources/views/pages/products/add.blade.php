@@ -39,13 +39,13 @@
                         <div class="form-group col-md-6">
                             <label class="form-control-label" for="brand_list">Brand</label>
                             <select class="form-control text-uppercase" id="brand_list" name="brand_id">
-                                <option>Select Brand</option>
+                                <option value="0">Select Brand</option>
                             </select>
                         </div>
                         <div class="form-group col-md-6">
                             <label class="form-control-label" for="category_list">Category</label>
                             <select class="form-control text-uppercase" id="category_list" name="category_id">
-                                <option>Select Category</option>
+                                <option value="0">Select Category</option>
                             </select>
                         </div>
                         <div class="col-md-12">

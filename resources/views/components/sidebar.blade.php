@@ -37,7 +37,7 @@
                         <li class="nav-item">
                             <a class="nav-link {{ 'customer.page' == $route ? 'active' : '' }}"
                                 href="{{ route('customer.page') }}">
-                                <i class="ni ni-circle-08 text-red"></i>
+                                <i class="fas fa-users text-red"></i>
                                 <span class="nav-link-text">Customers</span>
                             </a>
                         </li>
@@ -46,7 +46,7 @@
                                 href="#navbar-products" data-toggle="collapse" role="button"
                                 aria-expanded="{{ in_array($route, ['brand.page', 'category.page', 'product.page']) ? 'true' : 'false' }}"
                                 aria-controls="navbar-products">
-                                <i class="ni ni-circle-08 text-primary"></i>
+                                <i class="fas fa-seedling text-primary"></i>
                                 <span class="nav-link-text">Products</span>
                             </a>
                             <div class="collapse {{ in_array($route, ['brand.page', 'category.page', 'product.page']) ? 'show' : '' }}"
@@ -77,14 +77,14 @@
                             </div>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ in_array($route, ['sale.page']) ? 'active' : '' }}"
+                            <a class="nav-link {{ in_array($route, ['sale.page', 'invoice.list']) ? 'active' : '' }}"
                                 href="#navbar-sales" data-toggle="collapse" role="button"
-                                aria-expanded="{{ in_array($route, ['sale.page']) ? 'true' : 'false' }}"
+                                aria-expanded="{{ in_array($route, ['sale.page', 'invoice.list']) ? 'true' : 'false' }}"
                                 aria-controls="navbar-sales">
-                                <i class="ni ni-circle-08 text-primary"></i>
+                                <i class="fas fa-sleigh text-success"></i>
                                 <span class="nav-link-text">Sales</span>
                             </a>
-                            <div class="collapse {{ in_array($route, ['sale.page']) ? 'show' : '' }}"
+                            <div class="collapse {{ in_array($route, ['sale.page', 'invoice.list']) ? 'show' : '' }}"
                                 id="navbar-sales">
                                 <ul class="nav nav-sm flex-column">
                                     <li class="nav-item">
@@ -94,13 +94,20 @@
                                             <span class="sidenav-normal"> Sale </span>
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('invoice.list') }}"
+                                            class="nav-link {{ 'invoice.list' == $route ? 'active' : '' }}">
+                                            <span class="sidenav-mini-icon"> D </span>
+                                            <span class="sidenav-normal"> Invoices </span>
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link {{ 'staffs.page' == $route ? 'active' : '' }}"
                                 href="{{ route('staffs.page') }}">
-                                <i class="ni ni-circle-08 text-red"></i>
+                                <i class="fas fa-user-tie text-info"></i>
                                 <span class="nav-link-text">Staffs</span>
                             </a>
                         </li>
@@ -109,7 +116,7 @@
                                 href="#navbar-expenses" data-toggle="collapse" role="button"
                                 aria-expanded="{{ in_array($route, ['expense_category.page', 'expense.page']) ? 'true' : 'false' }}"
                                 aria-controls="navbar-expenses">
-                                <i class="ni ni-circle-08 text-primary"></i>
+                                <i class="fas fa-dollar-sign text-cyan"></i>
                                 <span class="nav-link-text">Expense</span>
                             </a>
                             <div class="collapse {{ in_array($route, ['expense_category.page', 'expense.page']) ? 'show' : '' }}"
@@ -132,11 +139,18 @@
                                 </ul>
                             </div>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ 'report.page' == $route ? 'active' : '' }}"
+                                href="{{ route('report.page') }}">
+                                <i class="fas fa-envelope text-red"></i>
+                                <span class="nav-link-text">Reports</span>
+                            </a>
+                        </li>
                         @if (in_array(request()->header('role'), ['admin', 'manager']))
                             <li class="nav-item">
                                 <a class="nav-link {{ 'promotion.page' == $route ? 'active' : '' }}"
                                     href="{{ route('promotion.page') }}">
-                                    <i class="ni ni-circle-08 text-red"></i>
+                                    <i class="fas fa-envelope text-red"></i>
                                     <span class="nav-link-text">Promotion Mail</span>
                                 </a>
                             </li>

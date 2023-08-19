@@ -114,15 +114,6 @@ class SaleInvoiceController extends Controller {
     }
 
     /**
-     * Single Invoice
-     * @param Request $request
-     * @return object
-     */
-    public function index( Request $request ): object {
-        return SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->with( 'customer' )->first();
-    }
-
-    /**
      * Invoice Details
      * @param Request $request
      * @return View
@@ -143,7 +134,43 @@ class SaleInvoiceController extends Controller {
         ];
         $customer = $result->customer->name;
         $shop = $result->shop->shop_name;
-        return view( 'pages.invoice.invoice_template', compact( 'invoice', 'customer', 'products', 'shop' ) );
+        return view( 'pages.sales.invoice.invoice_template', compact( 'invoice', 'customer', 'products', 'shop' ) );
 
+    }
+
+    /**
+     * Invoice List
+     * @param Request $request
+     * @return View
+     */
+    public function invoiceList(): View {
+        return view( 'pages.sales.invoice.invoice_list' );
+
+    }
+    /**
+     * Single Invoice
+     * @param Request $request
+     * @return object
+     */
+    public function allInvoice( Request $request ): object {
+        return SaleInvoice::where( 'shop_id', $request->header( 'shop_id' ) )->with( 'customer' )->get();
+    }
+
+    /**
+     * Delete Invoice
+     * @param Request
+     * @return JsonResponse
+     */
+    public function deleteInvoice( Request $request ): JsonResponse {
+        try {
+            DB::beginTransaction();
+            Sale::where( ['sale_invoice_id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->delete();
+            SaleInvoice::where( ['id' => $request->id, 'shop_id' => $request->header( 'shop_id' )] )->delete();
+            DB::commit();
+            return response()->json( ['status' => 'success', 'message' => 'Invoice Deleted Successfully'], 200 );
+        } catch ( \Throwable $th ) {
+            DB::rollBack();
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 200 );
+        }
     }
 }

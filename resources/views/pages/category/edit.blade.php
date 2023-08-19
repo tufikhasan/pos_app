@@ -12,13 +12,8 @@
                 <input type="hidden" id="up_id" name="id">
                 <div class="form-group">
                     <label for="">Name</label>
-                    <div class="input-group input-group-merge input-group-alternative mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text"><i class="ni ni-circle-08"></i></span>
-                        </div>
-                        <input class="form-control" placeholder="category Name" type="text" id="up_name"
-                            name="name">
-                    </div>
+                    <input class="form-control" placeholder="category Name" type="text" id="up_name"
+                        name="name">
                 </div>
                 <div class="form-group">
                     <label for="image">Image</label>
