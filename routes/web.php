@@ -13,6 +13,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromotionalMailController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleInvoiceController;
+use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StaffsController;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -30,9 +31,6 @@ Route::get( '/users', function () {
 Route::get( '/', function () {
     return view( 'welcome' );
 } );
-Route::get( '/dashboard', function () {
-    return "dashboard";
-} )->name( 'dashboard' )->middleware( 'verify.token' );
 
 Route::controller( AuthenticationController::class )->group( function () {
     //non authentication route
@@ -180,4 +178,10 @@ Route::middleware( 'auth.token' )->group( function () {
         Route::post( '/promotional/mail', 'sendPromotionMail' )->name( 'promotion.mail' )->middleware( 'role:admin,manager' );
         Route::get( '/promotional/mail', 'promotionPage' )->name( 'promotion.page' );
     } );
+
+    Route::controller( SiteSettingController::class )->group( function () {
+        Route::get( '/shop/setting', 'shopSettingPage' )->name( 'shop.setting.page' );
+        Route::post( '/shop/setting', 'shopUpdate' )->name( 'shop.update' );
+    } );
+
 } );
