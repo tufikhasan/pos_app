@@ -68,7 +68,7 @@
                 } else {
                     const URL = "{{ route('sale.report', [':formDate', ':toDate']) }}".replace(':formDate',
                         formDate).replace(':toDate', toDate);
-                    window.open(URL);
+                    window.open(URL, '_blank');
                 }
             } catch (error) {
                 console.log("Something went wrong");
@@ -88,7 +88,7 @@
                 } else {
                     const URL = "{{ route('expense.report', [':formDate', ':toDate']) }}".replace(':formDate',
                         formDate).replace(':toDate', toDate);
-                    window.open(URL);
+                    window.open(URL, '_blank');
                 }
             } catch (error) {
                 console.log("Something went wrong");

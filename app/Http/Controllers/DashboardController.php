@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
+use App\Models\Customer;
 use App\Models\Expense;
+use App\Models\Product;
 use App\Models\SaleInvoice;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
@@ -44,6 +48,11 @@ class DashboardController extends Controller {
             'todayExpenses'   => $todayExpenses,
         ];
 
-        return view( 'dashboard.dashboard', compact( 'totalSumData', 'todaySumData', 'monthlySumData', 'expenses' ) );
+        $customer = Customer::where( 'shop_id', $request->header( 'shop_id' ) )->count();
+        $staff = User::where( 'shop_id', $request->header( 'shop_id' ) )->whereNot( 'role', 'admin' )->count();
+        $category = Category::where( 'shop_id', $request->header( 'shop_id' ) )->count();
+        $product = Product::where( 'shop_id', $request->header( 'shop_id' ) )->count();
+
+        return view( 'dashboard.dashboard', compact( 'totalSumData', 'todaySumData', 'monthlySumData', 'expenses', 'customer', 'staff', 'category', 'product' ) );
     }
 }

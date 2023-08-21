@@ -1,6 +1,5 @@
 <?php
 
-use App\Helper\Jwt_token;
 use App\Http\Controllers\AuthenticationController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
@@ -15,22 +14,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleInvoiceController;
 use App\Http\Controllers\SiteSettingController;
 use App\Http\Controllers\StaffsController;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-//token check
-Route::get( '/token', function ( Request $request ) {
-    return Jwt_token::verify_token( $request->token );
-} );
-//all users
-Route::get( '/users', function () {
-    return User::all();
-} );
 
 Route::get( '/', function () {
     return view( 'welcome' );
-} );
+} )->middleware( 'check.token' );
 
 Route::controller( AuthenticationController::class )->group( function () {
     //non authentication route
