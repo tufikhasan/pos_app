@@ -8,7 +8,7 @@
             style="height: auto; margin-bottom: 0px; margin-right: 0px; max-height: 354px;">
             <!-- Brand -->
             <div class="sidenav-header  d-flex  align-items-center">
-                <a class="navbar-brand" href="javascript:void(0)">
+                <a class="navbar-brand" href="{{ route('dashboard') }}">
                     <img src="{{ file_exists(public_path('upload/shop/' . $shop->logo)) ? asset('upload/shop/' . $shop->logo) : asset('assets/img/blue.png') }}"
                         class="navbar-brand-img" alt="{{ $shop->shop_name }}" id="shop_logo">
                 </a>
@@ -144,7 +144,7 @@
                         <li class="nav-item">
                             <a class="nav-link {{ 'report.page' == $route ? 'active' : '' }}"
                                 href="{{ route('report.page') }}">
-                                <i class="fas fa-envelope text-red"></i>
+                                <i class="far fa-file-alt text-indigo"></i>
                                 <span class="nav-link-text">Reports</span>
                             </a>
                         </li>
@@ -152,7 +152,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {{ 'promotion.page' == $route ? 'active' : '' }}"
                                     href="{{ route('promotion.page') }}">
-                                    <i class="fas fa-envelope text-red"></i>
+                                    <i class="far fa-envelope text-red"></i>
                                     <span class="nav-link-text">Promotion Mail</span>
                                 </a>
                             </li>
@@ -160,7 +160,7 @@
                         <li class="nav-item">
                             <a class="nav-link {{ 'shop.setting.page' == $route ? 'active' : '' }}"
                                 href="{{ route('shop.setting.page') }}">
-                                <i class="fas fa-envelope text-red"></i>
+                                <i class="fas fa-cog text-orange"></i>
                                 <span class="nav-link-text">Shop Settings</span>
                             </a>
                         </li>

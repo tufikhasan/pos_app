@@ -171,6 +171,8 @@ Route::middleware( 'auth.token' )->group( function () {
 
     Route::controller( ReportController::class )->group( function () {
         Route::get( '/reports', 'getReport' )->name( 'report.page' );
+        Route::get( '/sales/report/{fromDate}/{toDate}', 'salesReport' )->name( 'sale.report' );
+        Route::get( '/expenses/report/{fromDate}/{toDate}', 'expensesReport' )->name( 'expense.report' );
     } );
 
     Route::controller( PromotionalMailController::class )->group( function () {
