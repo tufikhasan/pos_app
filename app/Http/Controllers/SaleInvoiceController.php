@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleInvoice;
 use Gloudemans\Shoppingcart\Facades\Cart;
@@ -48,11 +49,14 @@ class SaleInvoiceController extends Controller {
      */
     function updateCartQty( Request $request ): JsonResponse {
         try {
-            Cart::update( $request->rowId, $request->update_qty );
-            return response()->json( ['status' => 'success', 'message' => 'Product Quantity Updated Successfully'], 200 );
+            $qty = Product::where( ['shop_id' => $request->header( 'shop_id' ), 'id' => $request->up_product_id] )->select( 'stock' )->first();
+            if ( $request->update_qty <= $qty->stock ) {
+                Cart::update( $request->rowId, $request->update_qty );
+                return response()->json( ['status' => 'success', 'message' => "Product Quantity Updated Successfully"], 200 );
+            }
+            return response()->json( ['status' => 'failed', 'message' => "Only $qty->stock Products in Stock"], 200 );
         } catch ( \Throwable $th ) {
-            // return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
-            return response()->json( ['status' => 'failed', 'message' => $th->getMessage()], 400 );
+            return response()->json( ['status' => 'failed', 'message' => 'Something went wrong'], 400 );
         }
     }
 
@@ -94,6 +98,7 @@ class SaleInvoiceController extends Controller {
             }
 
             foreach ( Cart::content() as $key => $product ) {
+                Product::where( ['shop_id' => $invoice->shop_id, 'id' => $product->id] )->decrement( 'stock', $product->qty );
                 Sale::create( [
                     'sale_invoice_id' => $invoice->id,
                     'user_id'         => $invoice->user_id,
@@ -108,7 +113,7 @@ class SaleInvoiceController extends Controller {
             Cart::destroy();
             return response()->json( ['status' => 'success', 'message' => 'Invoice Create Successfully', 'id' => $invoice->id], 201 );
         } catch ( \Throwable $th ) {
-            // DB::rollBack();
+            DB::rollBack();
             return response()->json( ['status' => 'failed', 'message' => "Invoice Create Failed"], 200 );
         }
     }

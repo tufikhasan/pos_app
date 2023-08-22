@@ -189,6 +189,8 @@
             const unit = data.get("unit");
             const stock = data.get("stock");
             const price = data.get("price");
+            const brand = data.get("up_brand_list");
+            const category = data.get("up_category_list");
             const image = data.get("image");
 
             if (name.length == 0) {

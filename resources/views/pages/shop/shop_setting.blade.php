@@ -1,3 +1,6 @@
+@php
+    $user_role = request()->header('role');
+@endphp
 @extends('layouts.backend')
 @section('site_title', 'Shop Settings')
 @section('content')
@@ -28,9 +31,11 @@
                         <img width="70"
                             src="{{ file_exists(public_path('upload/shop/' . $shop->logo)) ? asset('upload/shop/' . $shop->logo) : asset('assets/img/no_image.jpg') }}"
                             id="up_shop_logo">
-                        <div class="text-right">
-                            <button class="btn btn-primary" type="submit">Update</button>
-                        </div>
+                        @if (in_array($user_role, ['admin', 'manager']))
+                            <div class="text-right">
+                                <button class="btn btn-primary" type="submit">Update</button>
+                            </div>
+                        @endif
                     </form>
                 </div>
             </div>
@@ -63,7 +68,9 @@
                     });
                     hideLoader();
                     if (response.status == 200 && response.data.status == 'success') {
-                        document.getElementById('shop_logo').src = URL.createObjectURL(logo);
+                        if (logo.size) {
+                            document.getElementById('shop_logo').src = URL.createObjectURL(logo);
+                        }
                         toastr.success(response.data.message);
                     }
                     if (response.status == 200 && response.data.status == 'failed') {

@@ -41,6 +41,7 @@
                                     <form class="update_qty_form">
                                         <div class="input-group mb-3" style="width: 90px;height:30px">
                                             <input type="hidden" value="{{ $product->rowId }}" name="up_rowId">
+                                            <input type="hidden" value="{{ $product->id }}" name="up_product_id">
                                             <input class="form-control" type="number" aria-describedby="update_qty"
                                                 value="{{ $product->qty }}" name="update_qty">
                                             <div class="input-group-append">
@@ -214,10 +215,12 @@
 
                 res.data.forEach((product, key) => {
                     document.getElementById('saleProduct_list').innerHTML += `
-                    <tr>   
+                    <tr>
                         <td class='align-middle'>
-                            <button class="add_to_cart btn btn-sm btn-primary d-flex justify-content-center" type="submit" data-id="${product['id']}" data-name="${product['name']}" data-price="${product['price']}"><i class="ni ni-basket"></i></button>
-                            </td>
+                            ${product['stock'] > 0 ?
+                            `<button class="add_to_cart btn btn-sm btn-primary d-flex justify-content-center" type="submit" data-id="${product['id']}" data-name="${product['name']}" data-price="${product['price']}"><i class="ni ni-basket"></i></button>`
+                            :'<span class="text-danger">Out Of Stock</span>'}   
+                        </td>
                         <td class='align-middle'><img width="60" src=${product['image'] ? "{{ asset('upload/product') }}/" + product['image'] : "{{ asset('assets/img/no_image.jpg') }}"} /></td>
                         <td class='align-middle'>${product['name']}</td>
                         <td class='align-middle'>${product['brand']['name']}</td>
@@ -280,6 +283,7 @@
         $(document).on('submit', '.update_qty_form', async function(e) {
             e.preventDefault();
             let rowId = $(this).find('[name="up_rowId"]').val();
+            let up_product_id = $(this).find('[name="up_product_id"]').val();
             let update_qty = $(this).find('[name="update_qty"]').val();
 
             try {
@@ -289,12 +293,17 @@
                     showLoader();
                     const removeURL = "{{ route('update.cart', ':rowId') }}".replace(':rowId', rowId);
                     const response = await axios.patch(removeURL, {
+                        up_product_id: up_product_id,
                         update_qty: update_qty
                     });
                     hideLoader();
                     if (response.status == 200 && response.data.status == 'success') {
                         await reloadContent();
                         toastr.success(response.data.message);
+                    }
+                    if (response.status == 200 && response.data.status == 'failed') {
+                        await reloadContent();
+                        toastr.error(response.data.message);
                     }
                 }
 

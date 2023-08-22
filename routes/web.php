@@ -121,7 +121,7 @@ Route::middleware( 'auth.token' )->group( function () {
         Route::get( '/invoice/details/{id}', 'invoiceDetails' )->name( 'invoice.details' );
         Route::get( '/invoices', 'invoiceList' )->name( 'invoice.list' );
         Route::get( '/invoice/list', 'allInvoice' )->name( 'all.invoice' );
-        Route::delete( '/delete/invoice/{id}', 'deleteInvoice' )->name( 'delete.invoice' );
+        Route::delete( '/delete/invoice/{id}', 'deleteInvoice' )->name( 'delete.invoice' )->middleware( 'role:admin' );
     } );
 
     Route::controller( StaffsController::class )->group( function () {
@@ -171,7 +171,7 @@ Route::middleware( 'auth.token' )->group( function () {
 
     Route::controller( SiteSettingController::class )->group( function () {
         Route::get( '/shop/setting', 'shopSettingPage' )->name( 'shop.setting.page' );
-        Route::post( '/shop/setting', 'shopUpdate' )->name( 'shop.update' );
+        Route::post( '/shop/setting', 'shopUpdate' )->name( 'shop.update' )->middleware( 'role:admin,manager' );;
     } );
 
 } );

@@ -9,7 +9,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="text-danger">Are you sure want to Invoice this users?</p>
+                <p class="text-danger">Are you sure want to delete this Invoice?</p>
                 <input type="hidden" id="del_invoice">
             </div>
             <div class="modal-footer">

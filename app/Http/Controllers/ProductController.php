@@ -127,7 +127,7 @@ class ProductController extends Controller {
                 'name'        => $request->name,
                 'price'       => $request->price,
                 'unit'        => $request->unit,
-                'stock'       => $request->sku,
+                'stock'       => $request->stock,
                 'brand_id'    => $request->brand_id,
                 'category_id' => $request->category_id,
                 'image'       => $imageUrl,
