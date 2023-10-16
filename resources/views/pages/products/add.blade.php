@@ -18,22 +18,22 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label for="sku">SKU</label>
-                            <input class="form-control" placeholder="product Name" type="text" name="sku"
+                            <input class="form-control" placeholder="sku_001" type="text" name="sku"
                                 id="sku">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="unit">Unit</label>
-                            <input class="form-control" placeholder="product Name" type="text" name="unit"
+                            <input class="form-control" placeholder="Unit(ps,kg,etc)" type="text" name="unit"
                                 id="unit">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="stock">Stock</label>
-                            <input class="form-control" placeholder="product Name" type="text" name="stock"
+                            <input class="form-control" placeholder="Stock" type="number" name="stock"
                                 id="stock">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="price">Price</label>
-                            <input class="form-control" placeholder="product Name" type="text" name="price"
+                            <input class="form-control" placeholder="Price" type="text" name="price"
                                 id="price">
                         </div>
                         <div class="form-group col-md-6">

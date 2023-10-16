@@ -106,6 +106,8 @@
                 hideLoader();
                 if (response.status == 201 && response.data.status == 'success') {
                     await getProducts();
+                    document.getElementById('pro_img_preview').src =
+                        "{{ asset('assets/img/no_image.jpg') }}";
                     closeModal('#add_product_modal', 'add_product_form');
                     toastr.success(response.data.message);
                 }
